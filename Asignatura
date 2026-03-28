@@ -1,0 +1,82 @@
+public abstract class Asignatura {
+
+    // ATRIBUTOS 
+
+    private String nombre;
+    private String codigo;
+    private int creditos;
+    private boolean aprobada;
+
+    // CONSTRUCTOR
+
+    public Asignatura(String nombre, String codigo, int creditos) {
+        this.nombre = nombre;
+        this.codigo = codigo;
+        this.creditos = creditos;
+        this.aprobada = false;
+    }
+
+
+    // GETTERS Y SETTERS (SIA-3)
+
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public int getCreditos() {
+        return creditos;
+    }
+
+    public void setCreditos(int creditos) {
+        this.creditos = creditos;
+    }
+
+    public boolean isAprobada() {
+        return aprobada;
+    }
+
+    public void setAprobada(boolean aprobada) {
+        this.aprobada = aprobada;
+    }
+
+
+    // MÉTODOS COMUNES
+
+
+    // Marcar como aprobada
+    public void aprobar() {
+        this.aprobada = true;
+    }
+
+    // Marcar como reprobada
+    public void reprobar() {
+        this.aprobada = false;
+    }
+
+   
+     public String getEstado() {
+        if (aprobada == true) {
+            return "Aprobada";
+        } else {
+            return "Pendiente";
+        }
+    }
+
+    // MÉTODO ABSTRACTO (SIA-6 ✔)
+
+    
+    public abstract void mostrarInfo();
+}
