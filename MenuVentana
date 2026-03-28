@@ -1,0 +1,393 @@
+package avanceCurricular;
+
+import javax.swing.JOptionPane;
+
+public class MenuVentana {
+
+    public void mostrarMenu(RegistroAlumnos registroAlumnos, RegistroProfesores registroProfesores) {
+        int opcion;
+
+        do {
+            String entrada = JOptionPane.showInputDialog(
+                    null,
+                    "MENU PRINCIPAL\n" +
+                    "1. Gestionar alumnos\n" +
+                    "2. Gestionar profesores\n" +
+                    "3. Salir\n" +
+                    "Seleccione una opcion:"
+            );
+
+            if (entrada == null) {
+                JOptionPane.showMessageDialog(null, "La aplicacion fue cerrada.");
+                return;
+            }
+
+            opcion = leerEntero(entrada);
+
+            switch (opcion) {
+                case 1:
+                    menuAlumnos(registroAlumnos);
+                    break;
+                case 2:
+                    menuProfesores(registroProfesores);
+                    break;
+                case 3:
+                    JOptionPane.showMessageDialog(null, "Saliendo del sistema...");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opcion invalida.");
+            }
+
+        } while (opcion != 3);
+    }
+
+    private void menuAlumnos(RegistroAlumnos registroAlumnos) {
+        int opcion;
+
+        do {
+            String entrada = JOptionPane.showInputDialog(
+                    null,
+                    "MENU ALUMNOS\n" +
+                    "1. Agregar alumno\n" +
+                    "2. Mostrar alumnos\n" +
+                    "3. Editar alumno\n" +
+                    "4. Eliminar alumno\n" +
+                    "5. Buscar alumno por ID\n" +
+                    "6. Buscar alumno por nombre y carrera\n" +
+                    "7. Mostrar alumnos en riesgo\n" +
+                    "8. Volver\n" +
+                    "Seleccione una opción:"
+            );
+
+            if (entrada == null) {
+                return;
+            }
+
+            opcion = leerEntero(entrada);
+
+            switch (opcion) {
+                case 1:
+                    agregarAlumno(registroAlumnos);
+                    break;
+                case 2:
+                    mostrarMensaje("ALUMNOS REGISTRADOS", obtenerListadoAlumnos(registroAlumnos));
+                    break;
+                case 3:
+                    editarAlumno(registroAlumnos);
+                    break;
+                case 4:
+                    eliminarAlumno(registroAlumnos);
+                    break;
+                case 5:
+                    buscarAlumnoPorId(registroAlumnos);
+                    break;
+                case 6:
+                    buscarAlumnoPorNombreYCarrera(registroAlumnos);
+                    break;
+                case 7:
+                    mostrarAlumnosEnRiesgo(registroAlumnos);
+                    break;
+                case 8:
+                    JOptionPane.showMessageDialog(null, "Volviendo al menu principal...");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opcion invalida.");
+            }
+
+        } while (opcion != 8);
+    }
+
+    private void menuProfesores(RegistroProfesores registroProfesores) {
+        int opcion;
+
+        do {
+            String entrada = JOptionPane.showInputDialog(
+                    null,
+                    "MENU PROFESORES\n" +
+                    "1. Agregar profesor\n" +
+                    "2. Mostrar profesores\n" +
+                    "3. Editar profesor\n" +
+                    "4. Eliminar profesor\n" +
+                    "5. Buscar profesor por ID\n" +
+                    "6. Buscar profesor por nombre\n" +
+                    "7. Mostrar profesores por especialidad\n" +
+                    "8. Volver\n" +
+                    "Seleccione una opcion:"
+            );
+
+            if (entrada == null) {
+                return;
+            }
+
+            opcion = leerEntero(entrada);
+
+            switch (opcion) {
+                case 1:
+                    agregarProfesor(registroProfesores);
+                    break;
+                case 2:
+                    mostrarMensaje("PROFESORES REGISTRADOS", obtenerListadoProfesores(registroProfesores));
+                    break;
+                case 3:
+                    editarProfesor(registroProfesores);
+                    break;
+                case 4:
+                    eliminarProfesor(registroProfesores);
+                    break;
+                case 5:
+                    buscarProfesorPorId(registroProfesores);
+                    break;
+                case 6:
+                    buscarProfesorPorNombre(registroProfesores);
+                    break;
+                case 7:
+                    mostrarProfesoresPorEspecialidad(registroProfesores);
+                    break;
+                case 8:
+                    JOptionPane.showMessageDialog(null, "Volviendo al menu principal...");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opcion invalida.");
+            }
+
+        } while (opcion != 8);
+    }
+
+    private void agregarAlumno(RegistroAlumnos registroAlumnos) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del alumno:");
+        if (id == null) return;
+
+        String nombre = JOptionPane.showInputDialog("Ingrese nombre del alumno:");
+        if (nombre == null) return;
+
+        String carrera = JOptionPane.showInputDialog("Ingrese carrera del alumno:");
+        if (carrera == null) return;
+
+        boolean agregado = registroAlumnos.agregarAlumno(id, nombre, carrera);
+
+        if (agregado == true) {
+            JOptionPane.showMessageDialog(null, "Alumno agregado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo agregar el alumno.");
+        }
+    }
+
+    private void editarAlumno(RegistroAlumnos registroAlumnos) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del alumno a editar:");
+        if (id == null) return;
+
+        String nuevoNombre = JOptionPane.showInputDialog("Ingrese nuevo nombre:");
+        if (nuevoNombre == null) return;
+
+        String nuevaCarrera = JOptionPane.showInputDialog("Ingrese nueva carrera:");
+        if (nuevaCarrera == null) return;
+
+        boolean editado = registroAlumnos.editarAlumno(id, nuevoNombre, nuevaCarrera);
+
+        if (editado == true) {
+            JOptionPane.showMessageDialog(null, "Alumno editado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encuentra el alumno.");
+        }
+    }
+
+    private void eliminarAlumno(RegistroAlumnos registroAlumnos) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del alumno a eliminar:");
+        if (id == null) return;
+
+        boolean eliminado = registroAlumnos.eliminarAlumno(id);
+
+        if (eliminado == true) {
+            JOptionPane.showMessageDialog(null, "Alumno eliminado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encuentra el alumno.");
+        }
+    }
+
+    private void buscarAlumnoPorId(RegistroAlumnos registroAlumnos) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del alumno:");
+        if (id == null) return;
+
+        Alumno alumno = registroAlumnos.buscarAlumno(id);
+
+        if (alumno != null) {
+            JOptionPane.showMessageDialog(null, formatearAlumno(alumno));
+        } else {
+            JOptionPane.showMessageDialog(null, "Alumno no encontrado.");
+        }
+    }
+
+    private void buscarAlumnoPorNombreYCarrera(RegistroAlumnos registroAlumnos) {
+        String nombre = JOptionPane.showInputDialog("Ingrese nombre del alumno:");
+        if (nombre == null) return;
+
+        String carrera = JOptionPane.showInputDialog("Ingrese carrera del alumno:");
+        if (carrera == null) return;
+
+        Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
+
+        if (alumno != null) {
+            JOptionPane.showMessageDialog(null, formatearAlumno(alumno));
+        } else {
+            JOptionPane.showMessageDialog(null, "Alumno no encontrado.");
+        }
+    }
+
+    private void mostrarAlumnosEnRiesgo(RegistroAlumnos registroAlumnos) {
+        String valor = JOptionPane.showInputDialog("Ingrese porcentaje minimo de progreso:");
+        if (valor == null) return;
+
+        try {
+            double porcentaje = Double.parseDouble(valor);
+            registroAlumnos.mostrarAlumnosEnRiesgo(porcentaje);
+            JOptionPane.showMessageDialog(null, "Revisar consola para ver el listado de alumnos en riesgo.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar un valor numerico valido.");
+        }
+    }
+
+    private void agregarProfesor(RegistroProfesores registroProfesores) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del profesor:");
+        if (id == null) return;
+
+        String nombre = JOptionPane.showInputDialog("Ingrese nombre del profesor:");
+        if (nombre == null) return;
+
+        String especialidad = JOptionPane.showInputDialog("Ingrese especialidad del profesor:");
+        if (especialidad == null) return;
+
+        boolean agregado = registroProfesores.agregarProfesor(id, nombre, especialidad);
+
+        if (agregado == true) {
+            JOptionPane.showMessageDialog(null, "Profesor agregado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo agregar el profesor.");
+        }
+    }
+
+    private void editarProfesor(RegistroProfesores registroProfesores) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del profesor a editar:");
+        if (id == null) return;
+
+        String nuevoNombre = JOptionPane.showInputDialog("Ingrese nuevo nombre:");
+        if (nuevoNombre == null) return;
+
+        String nuevaEspecialidad = JOptionPane.showInputDialog("Ingrese nueva especialidad:");
+        if (nuevaEspecialidad == null) return;
+
+        boolean editado = registroProfesores.editarProfesor(id, nuevoNombre, nuevaEspecialidad);
+
+        if (editado == true) {
+            JOptionPane.showMessageDialog(null, "Profesor editado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encuentra el profesor.");
+        }
+    }
+
+    private void eliminarProfesor(RegistroProfesores registroProfesores) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del profesor a eliminar:");
+        if (id == null) return;
+
+        boolean eliminado = registroProfesores.eliminarProfesor(id);
+
+        if (eliminado == true) {
+            JOptionPane.showMessageDialog(null, "Profesor eliminado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encuentra el profesor.");
+        }
+    }
+
+    private void buscarProfesorPorId(RegistroProfesores registroProfesores) {
+        String id = JOptionPane.showInputDialog("Ingrese ID del profesor:");
+        if (id == null) return;
+
+        Profesor profesor = registroProfesores.buscarProfesor(id);
+
+        if (profesor != null) {
+            JOptionPane.showMessageDialog(null, formatearProfesor(profesor));
+        } else {
+            JOptionPane.showMessageDialog(null, "Profesor no encontrado.");
+        }
+    }
+
+    private void buscarProfesorPorNombre(RegistroProfesores registroProfesores) {
+        String nombre = JOptionPane.showInputDialog("Ingrese nombre del profesor:");
+        if (nombre == null) return;
+
+        Profesor profesor = registroProfesores.buscarProfesorPorNombre(nombre);
+
+        if (profesor != null) {
+            JOptionPane.showMessageDialog(null, formatearProfesor(profesor));
+        } else {
+            JOptionPane.showMessageDialog(null, "Profesor no encontrado.");
+        }
+    }
+
+    private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
+        String especialidad = JOptionPane.showInputDialog("Ingrese especialidad:");
+        if (especialidad == null) return;
+
+        JOptionPane.showMessageDialog(null,
+                "Revisar consola para ver el listado de profesores por especialidad.");
+        registroProfesores.mostrarProfesoresPorEspecialidad(especialidad);
+    }
+
+    private int leerEntero(String entrada) {
+        try {
+            return Integer.parseInt(entrada);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private void mostrarMensaje(String titulo, String contenido) {
+        JOptionPane.showMessageDialog(null, contenido, titulo, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String obtenerListadoAlumnos(RegistroAlumnos registroAlumnos) {
+        if (registroAlumnos.getAlumnos().isEmpty()) {
+            return "No hay alumnos registrados.";
+        }
+
+        String texto = "";
+        for (Alumno alumno : registroAlumnos.getAlumnos().values()) {
+            texto += formatearAlumno(alumno) + "\n";
+        }
+
+        return texto;
+    }
+
+    private String obtenerListadoProfesores(RegistroProfesores registroProfesores) {
+        if (registroProfesores.getProfesores().isEmpty()) {
+            return "No hay profesores registrados.";
+        }
+
+        String texto = "";
+        for (Profesor profesor : registroProfesores.getProfesores().values()) {
+            texto += formatearProfesor(profesor) + "\n";
+        }
+
+        return texto;
+    }
+
+    private String formatearAlumno(Alumno alumno) {
+        String texto = "";
+        texto += "ID: " + alumno.getId() + "\n";
+        texto += "Nombre: " + alumno.getNombre() + "\n";
+        texto += "Carrera: " + alumno.getCarrera() + "\n";
+        texto += "Progreso: " + alumno.calcularProgreso() + "%\n";
+        texto += "Asignaturas inscritas: " + alumno.getMalla().size() + "\n";
+        texto += "-----------------------------";
+        return texto;
+    }
+
+    private String formatearProfesor(Profesor profesor) {
+        String texto = "";
+        texto += "ID: " + profesor.getId() + "\n";
+        texto += "Nombre: " + profesor.getNombre() + "\n";
+        texto += "Especialidad: " + profesor.getEspecialidad() + "\n";
+        texto += "Cantidad de asignaturas: " + profesor.getAsignaturas().size() + "\n";
+        texto += "-----------------------------";
+        return texto;
+    }
+}
