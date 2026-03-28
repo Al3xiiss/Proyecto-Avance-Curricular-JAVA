@@ -1,0 +1,331 @@
+package avanceCurricular;
+
+import java.util.*;
+
+public class MenuConsola {
+
+    private Scanner scanner;
+
+    public MenuConsola() {
+        this.scanner = new Scanner(System.in);
+    }
+
+    public void mostrarMenu(RegistroAlumnos registroAlumnos, RegistroProfesores registroProfesores) {
+        int opcion;
+
+        do {
+            System.out.println("\n========== MENU PRINCIPAL ==========");
+            System.out.println("1. Gestionar alumnos");
+            System.out.println("2. Gestionar profesores");
+            System.out.println("3. Salir");
+            System.out.print("Seleccione una opcion: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1:
+                    menuAlumnos(registroAlumnos);
+                    break;
+                case 2:
+                    menuProfesores(registroProfesores);
+                    break;
+                case 3:
+                    System.out.println("Saliendo del sistema...");
+                    break;
+                default:
+                    System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 3);
+    }
+
+    private void menuAlumnos(RegistroAlumnos registroAlumnos) {
+        int opcion;
+
+        do {
+            System.out.println("\n========== MENU ALUMNOS ==========");
+            System.out.println("1. Agregar alumno");
+            System.out.println("2. Mostrar alumnos");
+            System.out.println("3. Editar alumno");
+            System.out.println("4. Eliminar alumno");
+            System.out.println("5. Buscar alumno por ID");
+            System.out.println("6. Buscar alumno por nombre y carrera");
+            System.out.println("7. Mostrar alumnos en riesgo");
+            System.out.println("8. Volver");
+            System.out.print("Seleccione una opcion: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1:
+                    agregarAlumno(registroAlumnos);
+                    break;
+                case 2:
+                    registroAlumnos.mostrarAlumnos();
+                    break;
+                case 3:
+                    editarAlumno(registroAlumnos);
+                    break;
+                case 4:
+                    eliminarAlumno(registroAlumnos);
+                    break;
+                case 5:
+                    buscarAlumnoPorId(registroAlumnos);
+                    break;
+                case 6:
+                    buscarAlumnoPorNombreYCarrera(registroAlumnos);
+                    break;
+                case 7:
+                    mostrarAlumnosEnRiesgo(registroAlumnos);
+                    break;
+                case 8:
+                    System.out.println("Volviendo al menu principal...");
+                    break;
+                default:
+                    System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 8);
+    }
+
+    private void menuProfesores(RegistroProfesores registroProfesores) {
+        int opcion;
+
+        do {
+            System.out.println("\n========== MENU PROFESORES ==========");
+            System.out.println("1. Agregar profesor");
+            System.out.println("2. Mostrar profesores");
+            System.out.println("3. Editar profesor");
+            System.out.println("4. Eliminar profesor");
+            System.out.println("5. Buscar profesor por ID");
+            System.out.println("6. Buscar profesor por nombre");
+            System.out.println("7. Mostrar profesores por especialidad");
+            System.out.println("8. Volver");
+            System.out.print("Seleccione una opción: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1:
+                    agregarProfesor(registroProfesores);
+                    break;
+                case 2:
+                    registroProfesores.mostrarProfesores();
+                    break;
+                case 3:
+                    editarProfesor(registroProfesores);
+                    break;
+                case 4:
+                    eliminarProfesor(registroProfesores);
+                    break;
+                case 5:
+                    buscarProfesorPorId(registroProfesores);
+                    break;
+                case 6:
+                    buscarProfesorPorNombre(registroProfesores);
+                    break;
+                case 7:
+                    mostrarProfesoresPorEspecialidad(registroProfesores);
+                    break;
+                case 8:
+                    System.out.println("Volviendo al menú principal...");
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+
+        } while (opcion != 8);
+    }
+
+    private void agregarAlumno(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese ID del alumno Formato(A001): ");
+        String id = scanner.nextLine();
+
+        System.out.print("Ingrese nombre del alumno: ");
+        String nombre = scanner.nextLine();
+
+        System.out.print("Ingrese carrera del alumno: ");
+        String carrera = scanner.nextLine();
+
+        boolean agregado = registroAlumnos.agregarAlumno(id, nombre, carrera);
+
+        if (agregado == true) {
+            System.out.println("Alumno agregado correctamente.");
+        } else {
+            System.out.println("No se pudo agregar el alumno.");
+        }
+    }
+
+    private void editarAlumno(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese ID del alumno a editar: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Ingrese nuevo nombre: ");
+        String nuevoNombre = scanner.nextLine();
+
+        System.out.print("Ingrese nueva carrera: ");
+        String nuevaCarrera = scanner.nextLine();
+
+        boolean editado = registroAlumnos.editarAlumno(id, nuevoNombre, nuevaCarrera);
+
+        if (editado == true) {
+            System.out.println("Alumno editado correctamente.");
+        } else {
+            System.out.println("No se encuentra el alumno.");
+        }
+    }
+
+    private void eliminarAlumno(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese ID del alumno a eliminar: ");
+        String id = scanner.nextLine();
+
+        boolean eliminado = registroAlumnos.eliminarAlumno(id);
+
+        if (eliminado == true) {
+            System.out.println("Alumno eliminado correctamente.");
+        } else {
+            System.out.println("No se encuentra el alumno.");
+        }
+    }
+
+    private void buscarAlumnoPorId(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese ID del alumno: ");
+        String id = scanner.nextLine();
+
+        Alumno alumno = registroAlumnos.buscarAlumno(id);
+
+        if (alumno != null) {
+            alumno.mostrarInfo();
+        } else {
+            System.out.println("Alumno no encontrado.");
+        }
+    }
+
+    private void buscarAlumnoPorNombreYCarrera(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese nombre del alumno: ");
+        String nombre = scanner.nextLine();
+
+        System.out.print("Ingrese carrera del alumno: ");
+        String carrera = scanner.nextLine();
+
+        Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
+
+        if (alumno != null) {
+            alumno.mostrarInfo();
+        } else {
+            System.out.println("Alumno no encontrado.");
+        }
+    }
+
+    private void mostrarAlumnosEnRiesgo(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese porcentaje minimo de progreso: ");
+        double porcentaje = leerDouble();
+        registroAlumnos.mostrarAlumnosEnRiesgo(porcentaje);
+    }
+
+    private void agregarProfesor(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese ID del profesor: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Ingrese nombre del profesor: ");
+        String nombre = scanner.nextLine();
+
+        System.out.print("Ingrese especialidad del profesor: ");
+        String especialidad = scanner.nextLine();
+
+        boolean agregado = registroProfesores.agregarProfesor(id, nombre, especialidad);
+
+        if (agregado == true) {
+            System.out.println("Profesor agregado correctamente.");
+        } else {
+            System.out.println("No se pudo agregar el profesor.");
+        }
+    }
+
+    private void editarProfesor(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese ID del profesor a editar: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Ingrese nuevo nombre: ");
+        String nuevoNombre = scanner.nextLine();
+
+        System.out.print("Ingrese nueva especialidad: ");
+        String nuevaEspecialidad = scanner.nextLine();
+
+        boolean editado = registroProfesores.editarProfesor(id, nuevoNombre, nuevaEspecialidad);
+
+        if (editado == true) {
+            System.out.println("Profesor editado correctamente.");
+        } else {
+            System.out.println("No se encuentra el profesor.");
+        }
+    }
+
+    private void eliminarProfesor(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese ID del profesor a eliminar: ");
+        String id = scanner.nextLine();
+
+        boolean eliminado = registroProfesores.eliminarProfesor(id);
+
+        if (eliminado == true) {
+            System.out.println("Profesor eliminado correctamente.");
+        } else {
+            System.out.println("No se encuentra el profesor.");
+        }
+    }
+
+    private void buscarProfesorPorId(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese ID del profesor: ");
+        String id = scanner.nextLine();
+
+        Profesor profesor = registroProfesores.buscarProfesor(id);
+
+        if (profesor != null) {
+            profesor.mostrarInfo();
+        } else {
+            System.out.println("Profesor no encontrado.");
+        }
+    }
+
+    private void buscarProfesorPorNombre(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese nombre del profesor: ");
+        String nombre = scanner.nextLine();
+
+        Profesor profesor = registroProfesores.buscarProfesorPorNombre(nombre);
+
+        if (profesor != null) {
+            profesor.mostrarInfo();
+        } else {
+            System.out.println("Profesor no encontrado.");
+        }
+    }
+
+    private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
+        System.out.print("Ingrese especialidad: ");
+        String especialidad = scanner.nextLine();
+
+        registroProfesores.mostrarProfesoresPorEspecialidad(especialidad);
+    }
+
+    private int leerEntero() {
+        while (true) {
+            try {
+                String entrada = scanner.nextLine();
+                return Integer.parseInt(entrada);
+            } catch (NumberFormatException e) {
+                System.out.print("Ingrese un numero válido: ");
+            }
+        }
+    }
+
+    private double leerDouble() {
+        while (true) {
+            try {
+                String entrada = scanner.nextLine();
+                return Double.parseDouble(entrada);
+            } catch (NumberFormatException e) {
+                System.out.print("Ingrese un valor numerico valido: ");
+            }
+        }
+    }
+}
