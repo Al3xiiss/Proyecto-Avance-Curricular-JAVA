@@ -1,0 +1,115 @@
+import java.util.*;
+
+public class Alumno {
+
+    // Atributos 
+    private String id;
+    private String nombre;
+    private String carrera;
+    private List<Asignatura> malla;
+
+    // Constructor
+    public Alumno(String id, String nombre, String carrera) {
+        this.id = id;
+        this.nombre = nombre;
+        this.carrera = carrera;
+        this.malla = new ArrayList<>();
+    }
+
+    // =========================
+    // GETTERS Y SETTERS (SIA-3 )
+    // =========================
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getCarrera() {
+        return carrera;
+    }
+
+    public void setCarrera(String carrera) {
+        this.carrera = carrera;
+    }
+
+    public List<Asignatura> getMalla() {
+        return malla;
+    }
+
+    public void setMalla(List<Asignatura> malla) {
+        this.malla = malla;
+    }
+
+    // =========================
+    // MÉTODOS FUNCIONALES
+    // =========================
+
+    //  Agregar asignatura 
+    public void agregarAsignatura(Asignatura asignatura) {
+        if (asignatura != null) {
+            malla.add(asignatura);
+        }
+    }
+
+    //  SOBRECARGA (SIA-5)
+    // Crear y agregar asignatura directamente
+    public void agregarAsignatura(String nombre, String codigo, int creditos) {
+        Asignatura nueva = new AsignaturaObligatoria(nombre, codigo, creditos, 1);
+        malla.add(nueva);
+    }
+
+    //  Calcular progreso curricular (SIA-9)
+    public double calcularProgreso() {
+        int totalCreditos = 0;
+        int creditosAprobados = 0;
+
+        for (Asignatura a : malla) {
+            totalCreditos += a.getCreditos();
+
+            if (a.isAprobada()) {
+                creditosAprobados += a.getCreditos();
+            }
+        }
+
+        if (totalCreditos == 0) {
+            return 0;
+        }
+
+        return (double) creditosAprobados / totalCreditos * 100;
+    }
+
+    //  Funcionalidad útil extra (SIA-9)
+    public List<Asignatura> obtenerAsignaturasPendientes() {
+        List<Asignatura> pendientes = new ArrayList<>();
+
+        for (Asignatura a : malla) {
+            if (!a.isAprobada()) {
+                pendientes.add(a);
+            }
+        }
+
+        return pendientes;
+    }
+
+    //  Mostrar información del alumno
+    public void mostrarInfo() {
+        System.out.println("ID: " + id);
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Carrera: " + carrera);
+        System.out.println("Progreso: " + calcularProgreso() + "%");
+        System.out.println("Asignaturas inscritas: " + malla.size());
+        System.out.println("-----------------------------");
+    }
+}
