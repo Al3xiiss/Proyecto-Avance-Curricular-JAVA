@@ -1,0 +1,163 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collection;
+
+public class RegistroProfesores {
+
+
+    // ATRIBUTO
+
+    private Map<String, Profesor> profesores;
+
+
+    // CONSTRUCTOR
+
+    public RegistroProfesores() {
+        this.profesores = new HashMap<>();
+    }
+
+
+    // GETTER Y SETTER
+
+    public Map<String, Profesor> getProfesores() {
+        return profesores;
+    }
+
+    public void setProfesores(Map<String, Profesor> profesores) {
+        this.profesores = profesores;
+    }
+
+
+    // INSERCIÓN
+
+
+    public boolean agregarProfesor(Profesor profesor) {
+        if (profesor == null) {
+            return false;
+        }
+
+        if (profesor.getId() == null || profesor.getId().trim().isEmpty()) {
+            return false;
+        }
+
+        if (profesores.containsKey(profesor.getId())) {
+            return false;
+        }
+
+        profesores.put(profesor.getId(), profesor);
+        return true;
+    }
+
+    // SOBRECARGA (SIA-5)
+    public boolean agregarProfesor(String id, String nombre, String especialidad) {
+        Profesor profesor = new Profesor(id, nombre, especialidad);
+        return agregarProfesor(profesor);
+    }
+
+
+    // BÚSQUEDA
+
+
+    public Profesor buscarProfesor(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        return profesores.get(id);
+    }
+
+    // SOBRECARGA (SIA-5)
+    public Profesor buscarProfesorPorNombre(String nombre) {
+        Collection<Profesor> lista = profesores.values();
+
+        for (Profesor profesor : lista) {
+            if (profesor.getNombre().equalsIgnoreCase(nombre)) {
+                return profesor;
+            }
+        }
+
+        return null;
+    }
+
+
+    // EDICIÓN
+
+
+    public boolean editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) {
+        Profesor profesor = buscarProfesor(id);
+
+        if (profesor == null) {
+            return false;
+        }
+
+        profesor.setNombre(nuevoNombre);
+        profesor.setEspecialidad(nuevaEspecialidad);
+        return true;
+    }
+
+
+    // ELIMINACIÓN
+
+
+    public boolean eliminarProfesor(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        if (profesores.containsKey(id)) {
+            profesores.remove(id);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    // LISTADO
+
+
+    public void mostrarProfesores() {
+        if (profesores.isEmpty()) {
+            System.out.println("No hay profesores registrados.");
+            return;
+        }
+
+        for (Profesor profesor : profesores.values()) {
+            profesor.mostrarInfo();
+        }
+    }
+
+
+    // FUNCIONALIDAD DE NEGOCIO (SIA-9)
+
+
+    public void mostrarProfesoresPorEspecialidad(String especialidad) {
+        boolean encontrado = false;
+
+        for (Profesor profesor : profesores.values()) {
+            if (profesor.getEspecialidad().equalsIgnoreCase(especialidad)) {
+                profesor.mostrarInfo();
+                encontrado = true;
+            }
+        }
+
+        if (encontrado == false) {
+            System.out.println("No se encontraron profesores con esa especialidad.");
+        }
+    }
+
+
+    // UTILIDADES
+
+    public int getCantidadProfesores() {
+        return profesores.size();
+    }
+
+    public boolean existeProfesor(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        return profesores.containsKey(id);
+    }
+}
