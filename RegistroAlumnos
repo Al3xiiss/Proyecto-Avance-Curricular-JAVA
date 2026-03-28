@@ -1,0 +1,179 @@
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class RegistroAlumnos {
+
+
+    // ATRIBUTO
+
+    private Map<String, Alumno> alumnos;
+
+
+    // CONSTRUCTOR
+
+    public RegistroAlumnos() {
+        this.alumnos = new HashMap<>();
+    }
+
+
+    // GETTER Y SETTER
+
+    public Map<String, Alumno> getAlumnos() {
+        return alumnos;
+    }
+
+    public void setAlumnos(Map<String, Alumno> alumnos) {
+        this.alumnos = alumnos;
+    }
+
+
+    // MÉTODOS DE INSERCIÓN
+
+
+    // Inserción normal
+    public boolean agregarAlumno(Alumno alumno) {
+        if (alumno == null) {
+            return false;
+        }
+
+        if (alumno.getId() == null || alumno.getId().trim().isEmpty()) {
+            return false;
+        }
+
+        if (alumnos.containsKey(alumno.getId())) {
+            return false;
+        }
+
+        alumnos.put(alumno.getId(), alumno);
+        return true;
+    }
+
+    // SOBRECARGA (SIA-5)
+    public boolean agregarAlumno(String id, String nombre, String carrera) {
+        Alumno alumno = new Alumno(id, nombre, carrera);
+        return agregarAlumno(alumno);
+    }
+
+
+    // BÚSQUEDA
+
+
+    public Alumno buscarAlumno(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        return alumnos.get(id);
+    }
+
+    // SOBRECARGA (SIA-5)
+    public Alumno buscarAlumno(String nombre, String carrera) {
+        //Collection<Alumno> valores = alumnos.values();
+
+        for (Alumno alumno : alumnos.values()) {
+            if (alumno.getNombre().equalsIgnoreCase(nombre) &&
+                alumno.getCarrera().equalsIgnoreCase(carrera)) {
+                return alumno;
+            }
+        }
+
+        return null;
+    }
+
+
+    // EDICIÓN
+
+
+    public boolean editarAlumno(String id, String nuevoNombre, String nuevaCarrera) {
+        Alumno alumno = buscarAlumno(id);
+
+        if (alumno == null) {
+            return false;
+        }
+
+        alumno.setNombre(nuevoNombre);
+        alumno.setCarrera(nuevaCarrera);
+        return true;
+    }
+
+
+    // ELIMINACIÓN
+
+
+    public boolean eliminarAlumno(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        if (alumnos.containsKey(id)) {
+            alumnos.remove(id);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    // LISTADO
+
+
+    public void mostrarAlumnos() {
+        if (alumnos.isEmpty()) {
+            System.out.println("No hay alumnos registrados.");
+            return;
+        }
+
+        for (Alumno alumno : alumnos.values()) {
+            alumno.mostrarInfo();
+        }
+    }
+
+
+    // FUNCIONALIDAD DE NEGOCIO
+
+
+    public List<Alumno> obtenerAlumnosEnRiesgo(double porcentajeMinimo) {
+        List<Alumno> enRiesgo = new ArrayList<>();
+
+        for (Alumno alumno : alumnos.values()) {
+            if (alumno.calcularProgreso() < porcentajeMinimo) {
+                enRiesgo.add(alumno);
+            }
+        }
+
+        return enRiesgo;
+    }
+
+    public void mostrarAlumnosEnRiesgo(double porcentajeMinimo) {
+        List<Alumno> lista = obtenerAlumnosEnRiesgo(porcentajeMinimo);
+
+        if (lista.isEmpty()) {
+            System.out.println("No hay alumnos en riesgo.");
+            return;
+        }
+
+        System.out.println("ALUMNOS EN RIESGO (progreso menor a " + porcentajeMinimo + "%)");
+        for (Alumno alumno : lista) {
+            alumno.mostrarInfo();
+        }
+    }
+
+
+    // UTILIDAD
+
+
+    public int getCantidadAlumnos() {
+        return alumnos.size();
+    }
+
+    public boolean existeAlumno(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        return alumnos.containsKey(id);
+    }
+}
