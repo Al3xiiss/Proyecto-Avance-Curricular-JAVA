@@ -71,9 +71,9 @@ public class RegistroAlumnos {
 
     // SOBRECARGA (SIA-5)
     public Alumno buscarAlumno(String nombre, String carrera) {
-        //Collection<Alumno> valores = alumnos.values();
+        Collection<Alumno> valores = alumnos.values();
 
-        for (Alumno alumno : alumnos.values()) {
+        for (Alumno alumno : valores()) {
             if (alumno.getNombre().equalsIgnoreCase(nombre) &&
                 alumno.getCarrera().equalsIgnoreCase(carrera)) {
                 return alumno;
