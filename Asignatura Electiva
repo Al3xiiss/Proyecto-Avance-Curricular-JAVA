@@ -1,0 +1,37 @@
+public class AsignaturaElectiva extends Asignatura {
+
+    private String area;
+
+    public AsignaturaElectiva(String nombre, String codigo, int creditos, String area) {
+        super(nombre, codigo, creditos);
+        this.area = area;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    @Override
+    public void mostrarInfo() {
+
+        String estado;
+
+        if (this.isAprobada() == true) {
+            estado = "Aprobada";
+        } else {
+            estado = "Pendiente";
+        }
+
+        System.out.println("Tipo: Electiva");
+        System.out.println("Nombre: " + getNombre());
+        System.out.println("Código: " + getCodigo());
+        System.out.println("Créditos: " + getCreditos());
+        System.out.println("Área: " + area);
+        System.out.println("Estado: " + estado);
+        System.out.println("---------------------------");
+    }
+}
