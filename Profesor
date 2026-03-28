@@ -1,0 +1,113 @@
+import java.util.*;
+
+public class Profesor {
+
+
+    // ATRIBUTOS
+
+    private String id;
+    private String nombre;
+    private String especialidad;
+    private List<Asignatura> asignaturas;
+
+
+    // CONSTRUCTOR
+
+    public Profesor(String id, String nombre, String especialidad) {
+        this.id = id;
+        this.nombre = nombre;
+        this.especialidad = especialidad;
+        this.asignaturas = new ArrayList<>();
+    }
+
+
+    // GETTERS Y SETTERS
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEspecialidad() {
+        return especialidad;
+    }
+
+    public void setEspecialidad(String especialidad) {
+        this.especialidad = especialidad;
+    }
+
+    public List<Asignatura> getAsignaturas() {
+        return asignaturas;
+    }
+
+    public void setAsignaturas(List<Asignatura> asignaturas) {
+        this.asignaturas = asignaturas;
+    }
+
+
+    // MÉTODOS FUNCIONALES
+
+    public void asignarAsignatura(Asignatura asignatura) {
+        if (asignatura != null) {
+            asignaturas.add(asignatura);
+        }
+    }
+
+    public void eliminarAsignatura(String codigo) {
+        if (codigo == null) {
+            return;
+        }
+
+        for (int i = 0; i < asignaturas.size(); i++) {
+            Asignatura asignatura = asignaturas.get(i);
+
+            if (asignatura.getCodigo().equalsIgnoreCase(codigo)) {
+                asignaturas.remove(i);
+                break;
+            }
+        }
+    }
+
+    public boolean tieneAsignatura(String codigo) {
+        if (codigo == null) {
+            return false;
+        }
+
+        for (Asignatura asignatura : asignaturas) {
+            if (asignatura.getCodigo().equalsIgnoreCase(codigo)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void mostrarInfo() {
+        System.out.println("ID: " + id);
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Especialidad: " + especialidad);
+        System.out.println("Cantidad de asignaturas: " + asignaturas.size());
+
+        if (asignaturas.isEmpty()) {
+            System.out.println("Asignaturas: ninguna");
+        } else {
+            System.out.println("Asignaturas:");
+            for (Asignatura asignatura : asignaturas) {
+                System.out.println("- " + asignatura.getNombre() + " (" + asignatura.getCodigo() + ")");
+            }
+        }
+
+        System.out.println("-----------------------------");
+    }
+}
