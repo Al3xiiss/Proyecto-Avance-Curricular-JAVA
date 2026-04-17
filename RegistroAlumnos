@@ -1,4 +1,7 @@
+package avanceCurricular;
+
 import java.util.*;
+
 
 public class RegistroAlumnos {
 
@@ -57,11 +60,10 @@ public class RegistroAlumnos {
     // BÚSQUEDA
 
 
-    public Alumno buscarAlumno(String id) {
-        if (id == null) {
-            return null;
+    public Alumno buscarAlumno(String id) throws EntidadNoEncontradaException {
+        if (!alumnos.containsKey(id)) {
+            throw new EntidadNoEncontradaException("Error: El alumno con ID " + id + " no existe en el registro.");
         }
-
         return alumnos.get(id);
     }
 
@@ -69,7 +71,7 @@ public class RegistroAlumnos {
     public Alumno buscarAlumno(String nombre, String carrera) {
         Collection<Alumno> valores = alumnos.values();
 
-        for (Alumno alumno : valores()) {
+        for (Alumno alumno : valores) {
             if (alumno.getNombre().equalsIgnoreCase(nombre) &&
                 alumno.getCarrera().equalsIgnoreCase(carrera)) {
                 return alumno;
@@ -83,33 +85,28 @@ public class RegistroAlumnos {
     // EDICIÓN
 
 
-    public boolean editarAlumno(String id, String nuevoNombre, String nuevaCarrera) {
-        Alumno alumno = buscarAlumno(id);
-
-        if (alumno == null) {
-            return false;
+    // EDICIÓN
+    public void editarAlumno(String id, String nuevoNombre, String nuevaCarrera) throws EntidadNoEncontradaException, AtributoInvalidoException {      
+        // Lanzamos la excepción si los atributos no son válidos
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            throw new AtributoInvalidoException("Error: El nombre del alumno no puede estar vacío.");
         }
-
+        if (nuevaCarrera == null || nuevaCarrera.trim().isEmpty()) {
+            throw new AtributoInvalidoException("Error: La carrera no puede estar vacía.");
+        }
+        // Al llamar a buscarAlumno, si no lo encuentra, lanzará la excepción EntidadNoEncontradaException
+        Alumno alumno = buscarAlumno(id); 
         alumno.setNombre(nuevoNombre);
         alumno.setCarrera(nuevaCarrera);
-        return true;
     }
-
 
     // ELIMINACIÓN
 
-
-    public boolean eliminarAlumno(String id) {
-        if (id == null) {
-            return false;
+    public void eliminarAlumno(String id) throws EntidadNoEncontradaException {
+        if (!alumnos.containsKey(id)) {
+            throw new EntidadNoEncontradaException("Error: No se puede eliminar. El ID " + id + " no existe.");
         }
-
-        if (alumnos.containsKey(id)) {
-            alumnos.remove(id);
-            return true;
-        }
-
-        return false;
+        alumnos.remove(id);
     }
 
 
@@ -157,9 +154,7 @@ public class RegistroAlumnos {
         }
     }
 
-
     // UTILIDAD
-
 
     public int getCantidadAlumnos() {
         return alumnos.size();
