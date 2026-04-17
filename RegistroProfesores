@@ -1,24 +1,18 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collection;
+package avanceCurricular;
+
+import java.util.*;
 
 public class RegistroProfesores {
-
-
     // ATRIBUTO
-
     private Map<String, Profesor> profesores;
 
 
     // CONSTRUCTOR
-
     public RegistroProfesores() {
         this.profesores = new HashMap<>();
     }
-
-
+    
     // GETTER Y SETTER
-
     public Map<String, Profesor> getProfesores() {
         return profesores;
     }
@@ -29,8 +23,6 @@ public class RegistroProfesores {
 
 
     // INSERCIÓN
-
-
     public boolean agregarProfesor(Profesor profesor) {
         if (profesor == null) {
             return false;
@@ -56,8 +48,6 @@ public class RegistroProfesores {
 
 
     // BÚSQUEDA
-
-
     public Profesor buscarProfesor(String id) {
         if (id == null) {
             return null;
@@ -67,55 +57,43 @@ public class RegistroProfesores {
     }
 
     // SOBRECARGA (SIA-5)
-    public Profesor buscarProfesorPorNombre(String nombre) {
+    public Profesor buscarProfesorPorNombre(String nombre) throws EntidadNoEncontradaException {
         Collection<Profesor> lista = profesores.values();
-
         for (Profesor profesor : lista) {
             if (profesor.getNombre().equalsIgnoreCase(nombre)) {
                 return profesor;
             }
         }
-
-        return null;
-    }
-
-
-    // EDICIÓN
-
-
-    public boolean editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) {
-        Profesor profesor = buscarProfesor(id);
-
-        if (profesor == null) {
-            return false;
+    throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
+}
+  
+    // EDICIÓN    
+    public void editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) throws EntidadNoEncontradaException, AtributoInvalidoException {
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            throw new AtributoInvalidoException("Error: El nombre del profesor no puede estar vacío.");
+        }
+        if (nuevaEspecialidad == null || nuevaEspecialidad.trim().isEmpty()) {
+            throw new AtributoInvalidoException("Error: La especialidad no puede estar vacía.");
         }
 
+        Profesor profesor = buscarProfesor(id); 
+        if (profesor == null) {
+            throw new EntidadNoEncontradaException("Error: No se encontró un profesor con el ID indicado para editar.");
+        }
+        
         profesor.setNombre(nuevoNombre);
         profesor.setEspecialidad(nuevaEspecialidad);
-        return true;
     }
-
 
     // ELIMINACIÓN
-
-
-    public boolean eliminarProfesor(String id) {
-        if (id == null) {
-            return false;
+    public void eliminarProfesor(String id) throws EntidadNoEncontradaException {
+        if (!profesores.containsKey(id)) {
+            throw new EntidadNoEncontradaException("Error: No se puede eliminar. Profesor no encontrado.");
         }
-
-        if (profesores.containsKey(id)) {
-            profesores.remove(id);
-            return true;
-        }
-
-        return false;
+        profesores.remove(id);
     }
 
-
     // LISTADO
-
-
     public void mostrarProfesores() {
         if (profesores.isEmpty()) {
             System.out.println("No hay profesores registrados.");
@@ -127,10 +105,7 @@ public class RegistroProfesores {
         }
     }
 
-
     // FUNCIONALIDAD DE NEGOCIO (SIA-9)
-
-
     public void mostrarProfesoresPorEspecialidad(String especialidad) {
         boolean encontrado = false;
 
@@ -146,9 +121,7 @@ public class RegistroProfesores {
         }
     }
 
-
     // UTILIDADES
-
     public int getCantidadProfesores() {
         return profesores.size();
     }
