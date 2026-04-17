@@ -1,3 +1,5 @@
+package avanceCurricular;
+
 public abstract class Asignatura {
 
     // ATRIBUTOS 
@@ -53,8 +55,7 @@ public abstract class Asignatura {
     }
 
 
-    // MÉTODOS COMUNES
-
+    // MÉTODOS 
 
     // Marcar como aprobada
     public void aprobar() {
@@ -75,8 +76,7 @@ public abstract class Asignatura {
         }
     }
 
-    // MÉTODO ABSTRACTO (SIA-6 ✔)
+    // MÉTODO ABSTRACTO (SIA-6)
 
-    
     public abstract void mostrarInfo();
 }
