@@ -1,3 +1,4 @@
+package avanceCurricular;
 import java.util.*;
 
 public class Profesor {
@@ -91,6 +92,14 @@ public class Profesor {
         }
 
         return false;
+    }
+    public Asignatura buscarAsignatura(String codigo) {
+        for (Asignatura a : asignaturas) {
+            if (a.getCodigo().equalsIgnoreCase(codigo)) {
+                return a;
+            }
+        }
+        return null;
     }
 
     public void mostrarInfo() {
