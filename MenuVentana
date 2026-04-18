@@ -421,7 +421,7 @@ public class MenuVentana {
                     .append(" (").append(asig.getCreditos()).append(" créditos)\n");
         }
 
-        // Usamos un JTextArea dentro del Scroll por si la lista es muy larga
+        // Usamos un JTextArea dentro del Scroll por si la lista es muy extensa
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -770,7 +770,7 @@ public class MenuVentana {
     }
 
     private void mostrarMensaje(String titulo, String contenido) {
-        // 1. Creamos un área de texto donde irá el listado
+        // 1. Creamos un área de texto donde irá el listado de datos
         JTextArea textArea = new JTextArea(20, 50); // 20 filas de alto
         textArea.setText(contenido);
         textArea.setEditable(false); // Para que no puedan editar el listado
