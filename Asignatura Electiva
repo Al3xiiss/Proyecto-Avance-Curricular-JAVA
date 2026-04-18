@@ -1,3 +1,5 @@
+package avanceCurricular;
+
 public class AsignaturaElectiva extends Asignatura {
 
     private String area;
