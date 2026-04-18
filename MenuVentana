@@ -548,7 +548,17 @@ public class MenuVentana {
     }
 
     private void mostrarMensaje(String titulo, String contenido) {
-        JOptionPane.showMessageDialog(null, contenido, titulo, JOptionPane.INFORMATION_MESSAGE);
+        // 1. Creamos un área de texto donde irá el listado
+        JTextArea textArea = new JTextArea(20, 50); // 20 filas de alto
+        textArea.setText(contenido);
+        textArea.setEditable(false); // Para que no puedan editar el listado
+        textArea.setLineWrap(true);  // Ajuste de línea automático
+        textArea.setWrapStyleWord(true);
+        textArea.setCaretPosition(0); // Para que siempre empiece arriba de todo
+        // 2. Metemos esa área de texto dentro de un JScrollPane (la barrita)
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        // 3. Mostramos el scrollPane en lugar del texto plano
+        JOptionPane.showMessageDialog(null, scrollPane, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
 
     private String obtenerListadoAlumnos(RegistroAlumnos registroAlumnos) {
