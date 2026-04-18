@@ -3,15 +3,15 @@ package avanceCurricular;
 import java.util.*;
 
 public class RegistroProfesores {
+
     // ATRIBUTO
     private Map<String, Profesor> profesores;
-
 
     // CONSTRUCTOR
     public RegistroProfesores() {
         this.profesores = new HashMap<>();
     }
-    
+
     // GETTER Y SETTER
     public Map<String, Profesor> getProfesores() {
         return profesores;
@@ -20,7 +20,6 @@ public class RegistroProfesores {
     public void setProfesores(Map<String, Profesor> profesores) {
         this.profesores = profesores;
     }
-
 
     // INSERCIÓN
     public boolean agregarProfesor(Profesor profesor) {
@@ -46,16 +45,14 @@ public class RegistroProfesores {
         return agregarProfesor(profesor);
     }
 
-
     // BÚSQUEDA
-
-public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
-    Profesor p = profesores.get(id);
-    if (p == null) {
-        throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
+    public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
+        Profesor p = profesores.get(id);
+        if (p == null) {
+            throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
+        }
+        return p;
     }
-    return p;
-}
 
     // SOBRECARGA (SIA-5)
     public Profesor buscarProfesorPorNombre(String nombre) throws EntidadNoEncontradaException {
@@ -65,9 +62,9 @@ public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
                 return profesor;
             }
         }
-    throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
-}
-  
+        throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
+    }
+
     // EDICIÓN    
     public void editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) throws EntidadNoEncontradaException, AtributoInvalidoException {
         if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
@@ -77,11 +74,11 @@ public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
             throw new AtributoInvalidoException("Error: La especialidad no puede estar vacía.");
         }
 
-        Profesor profesor = buscarProfesor(id); 
+        Profesor profesor = buscarProfesor(id);
         if (profesor == null) {
             throw new EntidadNoEncontradaException("Error: No se encontró un profesor con el ID indicado para editar.");
         }
-        
+
         profesor.setNombre(nuevoNombre);
         profesor.setEspecialidad(nuevaEspecialidad);
     }
