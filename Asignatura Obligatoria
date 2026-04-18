@@ -1,3 +1,5 @@
+package avanceCurricular;
+
 public class AsignaturaObligatoria extends Asignatura {
 
     private int semestre;
