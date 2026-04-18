@@ -48,13 +48,14 @@ public class RegistroProfesores {
 
 
     // BÚSQUEDA
-    public Profesor buscarProfesor(String id) {
-        if (id == null) {
-            return null;
-        }
 
-        return profesores.get(id);
+public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
+    Profesor p = profesores.get(id);
+    if (p == null) {
+        throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
     }
+    return p;
+}
 
     // SOBRECARGA (SIA-5)
     public Profesor buscarProfesorPorNombre(String nombre) throws EntidadNoEncontradaException {
