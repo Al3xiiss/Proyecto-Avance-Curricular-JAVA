@@ -1,0 +1,172 @@
+package avanceCurricular;
+
+import java.io.*;
+import java.util.*;
+
+public class PersistenciaData {
+
+    private static final String ARCHIVO_ALUMNOS = "alumnos.txt";
+    private static final String ARCHIVO_PROFESORES = "profesores.txt";
+    private static final String ASIG_ALUMNOS = "asignaturas_alumnos.txt";
+    private static final String ASIG_PROFESORES = "asignaturas_profesores.txt";
+
+    // ==========================================================
+    // MÉTODOS DE CARGA (BATCH AL INICIAR)
+    // ==========================================================
+
+    public static void cargarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
+        cargarAlumnos(ra);
+        cargarProfesores(rp);
+        cargarAsignaturasAlumnos(ra);
+        cargarAsignaturasProfesores(rp);
+        System.out.println("Datos y asignaturas cargados correctamente.");
+    }
+
+    private static void cargarAlumnos(RegistroAlumnos ra) {
+        File file = new File(ARCHIVO_ALUMNOS);
+        if (!file.exists()) return;
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String[] partes = sc.nextLine().split(";");
+                if (partes.length == 3) ra.agregarAlumno(partes[0], partes[1], partes[2]);
+            }
+        } catch (Exception e) {
+            System.err.println("Error alumnos: " + e.getMessage());
+        }
+    }
+
+    private static void cargarProfesores(RegistroProfesores rp) {
+        File file = new File(ARCHIVO_PROFESORES);
+        if (!file.exists()) return;
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String[] partes = sc.nextLine().split(";");
+                if (partes.length == 3) rp.agregarProfesor(partes[0], partes[1], partes[2]);
+            }
+        } catch (Exception e) {
+            System.err.println("Error profesores: " + e.getMessage());
+        }
+    }
+
+    public static void cargarAsignaturasAlumnos(RegistroAlumnos ra) {
+        File file = new File(ASIG_ALUMNOS);
+        if (!file.exists()) return;
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(";");
+                if (p.length < 7) continue;
+
+                String idAlumno = p[0];
+                String tipo = p[1];
+                String nombre = p[2];
+                String codigo = p[3];
+                int creditos = Integer.parseInt(p[4]);
+                boolean aprobada = Boolean.parseBoolean(p[5]);
+
+                Asignatura asig = tipo.equals("OBL") 
+                    ? new AsignaturaObligatoria(nombre, codigo, creditos, Integer.parseInt(p[6]))
+                    : new AsignaturaElectiva(nombre, codigo, creditos, p[6]);
+                
+                asig.setAprobada(aprobada);
+                Alumno alumno = ra.getAlumnos().get(idAlumno);
+                if (alumno != null) alumno.agregarAsignatura(asig);
+            }
+        } catch (Exception e) {
+            System.err.println("Error asig alumnos: " + e.getMessage());
+        }
+    }
+
+    public static void cargarAsignaturasProfesores(RegistroProfesores rp) {
+        File file = new File(ASIG_PROFESORES);
+        if (!file.exists()) return;
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String[] p = sc.nextLine().split(";");
+                if (p.length < 7) continue;
+
+                String idProf = p[0];
+                String tipo = p[1];
+                String nombre = p[2];
+                String codigo = p[3];
+                int creditos = Integer.parseInt(p[4]);
+
+                Asignatura asig = tipo.equals("OBL")
+                    ? new AsignaturaObligatoria(nombre, codigo, creditos, Integer.parseInt(p[6]))
+                    : new AsignaturaElectiva(nombre, codigo, creditos, p[6]);
+
+                Profesor prof = rp.getProfesores().get(idProf);
+                if (prof != null) prof.getAsignaturas().add(asig);
+            }
+        } catch (Exception e) {
+            System.err.println("Error asig profesores: " + e.getMessage());
+        }
+    }
+
+    // ==========================================================
+    // MÉTODOS DE GUARDADO (BATCH AL SALIR)
+    // ==========================================================
+
+    public static void guardarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
+        guardarAlumnos(ra);
+        guardarProfesores(rp);
+        guardarAsignaturasAlumnos(ra);
+        guardarAsignaturasProfesores(rp);
+        System.out.println(" Todos los cambios han sido guardados en los archivos.");
+    }
+
+    private static void guardarAlumnos(RegistroAlumnos ra) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ARCHIVO_ALUMNOS))) {
+            for (Alumno a : ra.getAlumnos().values()) {
+                pw.println(a.getId() + ";" + a.getNombre() + ";" + a.getCarrera());
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar alumnos: " + e.getMessage());
+        }
+    }
+
+    private static void guardarProfesores(RegistroProfesores rp) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ARCHIVO_PROFESORES))) {
+            for (Profesor p : rp.getProfesores().values()) {
+                pw.println(p.getId() + ";" + p.getNombre() + ";" + p.getEspecialidad());
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar profesores: " + e.getMessage());
+        }
+    }
+
+    private static void guardarAsignaturasAlumnos(RegistroAlumnos ra) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ASIG_ALUMNOS))) {
+            for (Alumno a : ra.getAlumnos().values()) {
+                for (Asignatura asig : a.getMalla()) {
+                    String tipo = (asig instanceof AsignaturaObligatoria) ? "OBL" : "ELE";
+                    String extra = (asig instanceof AsignaturaObligatoria) 
+                        ? String.valueOf(((AsignaturaObligatoria)asig).getSemestre()) 
+                        : ((AsignaturaElectiva)asig).getArea();
+                    
+                    pw.println(a.getId() + ";" + tipo + ";" + asig.getNombre() + ";" + 
+                               asig.getCodigo() + ";" + asig.getCreditos() + ";" + 
+                               asig.isAprobada() + ";" + extra);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar asignaturas alumnos: " + e.getMessage());
+        }
+    }
+
+    private static void guardarAsignaturasProfesores(RegistroProfesores rp) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ASIG_PROFESORES))) {
+            for (Profesor p : rp.getProfesores().values()) {
+                for (Asignatura asig : p.getAsignaturas()) {
+                    String tipo = (asig instanceof AsignaturaObligatoria) ? "OBL" : "ELE";
+                    String extra = (asig instanceof AsignaturaObligatoria) 
+                        ? String.valueOf(((AsignaturaObligatoria)asig).getSemestre()) 
+                        : ((AsignaturaElectiva)asig).getArea();
+                    
+                    pw.println(p.getId() + ";" + tipo + ";" + asig.getNombre() + ";" + 
+                               asig.getCodigo() + ";" + asig.getCreditos() + ";true;" + extra);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar asignaturas profesores: " + e.getMessage());
+        }
+    }
