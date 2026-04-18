@@ -1,68 +1,44 @@
+package avanceCurricular;
 import javax.swing.JOptionPane;
 
 public class Main {
 
     public static void main(String[] args) {
-
+        // 1. Instanciar los registros (bases de datos en memoria)
         RegistroAlumnos registroAlumnos = new RegistroAlumnos();
         RegistroProfesores registroProfesores = new RegistroProfesores();
 
-        cargarDatosIniciales(registroAlumnos, registroProfesores);
+        // 2. SIA-11: CARGA BATCH AL INICIAR
+        // Carga alumnos, profesores y todas sus asignaturas desde los .txt
+        PersistenciaData.cargarTodo(registroAlumnos, registroProfesores);
 
+        // 3. Selección del modo de ejecución
         String opcion = JOptionPane.showInputDialog(
                 null,
-                "Seleccione el modo de ejecución:\n1. Consola\n2. Ventana",
-                "Sistema Académico",
+                "Seleccione el modo de ejecucion:\n1. Consola\n2. Ventana",
+                "Sistema Academico - Avance Curricular",
                 JOptionPane.QUESTION_MESSAGE
         );
 
+        // 4. Lógica de flujo según la opción elegida
         if (opcion == null) {
-            JOptionPane.showMessageDialog(null, "La aplicación fue cerrada.");
-            return;
-        }
-
-        if (opcion.equals("1")) {
+            JOptionPane.showMessageDialog(null, "La aplicacion fue cerrada.");
+        } else if (opcion.equals("1")) {
             MenuConsola menuConsola = new MenuConsola();
             menuConsola.mostrarMenu(registroAlumnos, registroProfesores);
         } else if (opcion.equals("2")) {
             MenuVentana menuVentana = new MenuVentana();
             menuVentana.mostrarMenu(registroAlumnos, registroProfesores);
         } else {
-            JOptionPane.showMessageDialog(null, "Opción inválida. El programa finalizará.");
+            JOptionPane.showMessageDialog(null, "Opcion invalida.");
         }
-    }
 
-    private static void cargarDatosIniciales(RegistroAlumnos registroAlumnos,
-                                             RegistroProfesores registroProfesores) {
-
-        Alumno alumno1 = new Alumno("A001", "Juan Pérez", "Ingeniería en Sistemas");
-        Alumno alumno2 = new Alumno("A002", "María López", "Ingeniería en Sistemas");
-
-        AsignaturaObligatoria asig1 = new AsignaturaObligatoria("Programación I", "INF101", 6, 1);
-        asig1.setAprobada(true);
-
-        AsignaturaObligatoria asig2 = new AsignaturaObligatoria("Bases de Datos", "INF201", 5, 2);
-        asig2.setAprobada(false);
-
-        AsignaturaElectiva asig3 = new AsignaturaElectiva("Robótica Básica", "ELE301", 4, "Tecnología");
-        asig3.setAprobada(true);
-
-        alumno1.agregarAsignatura(asig1);
-        alumno1.agregarAsignatura(asig2);
-
-        alumno2.agregarAsignatura(asig1);
-        alumno2.agregarAsignatura(asig3);
-
-        registroAlumnos.agregarAlumno(alumno1);
-        registroAlumnos.agregarAlumno(alumno2);
-
-        Profesor profesor1 = new Profesor("P001", "Carlos Ramírez", "Programación");
-        Profesor profesor2 = new Profesor("P002", "Ana Torres", "Bases de Datos");
-
-        profesor1.asignarAsignatura(asig1);
-        profesor2.asignarAsignatura(asig2);
-
-        registroProfesores.agregarProfesor(profesor1);
-        registroProfesores.agregarProfesor(profesor2);
+        // 5. SIA-11: GUARDADO BATCH AL SALIR
+        // Antes de que el programa muera, guardamos todos los cambios realizados
+        System.out.println("Guardando cambios en archivos...");
+        PersistenciaData.guardarTodo(registroAlumnos, registroProfesores);
+        
+        System.out.println("Cierre seguro completado.");
+        System.exit(0);
     }
 }
