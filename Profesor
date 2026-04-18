@@ -1,19 +1,16 @@
 package avanceCurricular;
+
 import java.util.*;
 
 public class Profesor {
 
-
     // ATRIBUTOS
-
     private String id;
     private String nombre;
     private String especialidad;
     private List<Asignatura> asignaturas;
 
-
     // CONSTRUCTOR
-
     public Profesor(String id, String nombre, String especialidad) {
         this.id = id;
         this.nombre = nombre;
@@ -21,9 +18,7 @@ public class Profesor {
         this.asignaturas = new ArrayList<>();
     }
 
-
     // GETTERS Y SETTERS
-
     public String getId() {
         return id;
     }
@@ -56,9 +51,7 @@ public class Profesor {
         this.asignaturas = asignaturas;
     }
 
-
     // MÉTODOS FUNCIONALES
-
     public void asignarAsignatura(Asignatura asignatura) {
         if (asignatura != null) {
             asignaturas.add(asignatura);
@@ -93,13 +86,14 @@ public class Profesor {
 
         return false;
     }
-    public Asignatura buscarAsignatura(String codigo) {
+
+    public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
         for (Asignatura a : asignaturas) {
             if (a.getCodigo().equalsIgnoreCase(codigo)) {
                 return a;
             }
         }
-        return null;
+        throw new EntidadNoEncontradaException("Error: La asignatura con código " + codigo + " no existe para este profesor.");
     }
 
     public void mostrarInfo() {
