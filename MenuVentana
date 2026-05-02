@@ -3,8 +3,19 @@ package avanceCurricular;
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * Clase encargada de gestionar la Interfaz de Usuario Gráfica (GUI) mediante ventanas emergentes.
+ * Utiliza la librería Swing (JOptionPane) para capturar datos, mostrar menús y 
+ * desplegar resultados o errores, actuando como intermediaria con la lógica de negocio.
+ */
 public class MenuVentana {
 
+    /**
+     * Muestra el menú principal de la aplicación en una ventana emergente y gestiona el flujo inicial.
+     * 
+     * @param registroAlumnos Gestor en memoria de la base de datos de alumnos.
+     * @param registroProfesores Gestor en memoria de la base de datos de profesores.
+     */
     public void mostrarMenu(RegistroAlumnos registroAlumnos, RegistroProfesores registroProfesores) {
         int opcion;
 
@@ -20,6 +31,7 @@ public class MenuVentana {
                     JOptionPane.QUESTION_MESSAGE
             );
 
+            // Manejo de la cancelación de la ventana
             if (entrada == null) {
                 JOptionPane.showMessageDialog(null, "La aplicacion fue cerrada.");
                 return;
@@ -44,6 +56,11 @@ public class MenuVentana {
         } while (opcion != 3);
     }
 
+    /**
+     * Despliega el submenú interactivo dedicado a las operaciones de la entidad Alumno.
+     * 
+     * @param registroAlumnos Instancia del gestor de alumnos.
+     */
     private void menuAlumnos(RegistroAlumnos registroAlumnos) {
         int opcion;
 
@@ -107,6 +124,11 @@ public class MenuVentana {
         } while (opcion != 10);
     }
 
+    /**
+     * Despliega el submenú interactivo dedicado a las operaciones de la entidad Profesor.
+     * 
+     * @param registroProfesores Instancia del gestor de profesores.
+     */
     private void menuProfesores(RegistroProfesores registroProfesores) {
         int opcion;
 
@@ -167,6 +189,13 @@ public class MenuVentana {
     // ==========================================================
     // GESTIÓN DE ASIGNATURAS (NUEVOS MÉTODOS)
     // ==========================================================
+    
+    /**
+     * Inicia el flujo de gestión de la malla curricular para un alumno específico.
+     * Captura excepciones si el alumno no existe y muestra un cuadro de error.
+     * 
+     * @param registroAlumnos Gestor necesario para validar la existencia del alumno.
+     */
     private void gestionarAsignaturasAlumno(RegistroAlumnos registroAlumnos) {
         String id = JOptionPane.showInputDialog("Ingrese ID del alumno para gestionar su malla:");
 
@@ -175,14 +204,10 @@ public class MenuVentana {
         }
 
         try {
-
-            // Buscamos al alumno (lanza excepción si no existe)
             Alumno alumno = registroAlumnos.buscarAlumno(id);
-
             int opcion;
 
             do {
-
                 String menu = "Gestion de Asignaturas - Alumno: " + alumno.getNombre().toUpperCase() + "\n"
                         + "1. Agregar Asignatura\n"
                         + "2. Mostrar Malla Curricular\n"
@@ -200,51 +225,43 @@ public class MenuVentana {
                 opcion = leerEntero(entrada);
 
                 switch (opcion) {
-
-                    case 1: // Agregar Asignatura
-
+                    case 1:
                         agregarAsignaturaMalla(alumno);
                         break;
-
-                    case 2: // Mostrar Malla
+                    case 2:
                         mostrarMalla(alumno);
                         break;
-
-                    case 3: // Modificar Estado (SIA-12)
+                    case 3:
                         modificarEstadoAsignatura(alumno);
                         break;
-
-                    case 4: // Eliminar Asignatura (SIA-12)
+                    case 4:
                         eliminarAsignaturaMalla(alumno);
                         break;
-
-                    case 5: // Buscar por Código (SIA-12)
+                    case 5:
                         buscarAsignaturaMalla(alumno);
                         break;
                 }
             } while (opcion != 6);
 
         } catch (EntidadNoEncontradaException e) {
-            // Este catch atrapa si el Alumno inicial no fue encontrado
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Solicita datos mediante ventanas emergentes para agregar una nueva asignatura a un alumno.
+     * 
+     * @param alumno El objeto Alumno al cual se le añadirá la asignatura.
+     */
     private void agregarAsignaturaMalla(Alumno alumno) {
         String tipo = JOptionPane.showInputDialog("Tipo de asignatura:\n1. Obligatoria\n2. Electiva\n3. Rapida (Obligatoria Semestre 1)");
-        if (tipo == null) {
-            return;
-        }
+        if (tipo == null) return;
 
         String nom = JOptionPane.showInputDialog("Nombre de la asignatura:");
-        if (nom == null) {
-            return;
-        }
+        if (nom == null) return;
 
         String cod = JOptionPane.showInputDialog("Codigo:");
-        if (cod == null) {
-            return;
-        }
+        if (cod == null) return;
 
         int cre = leerEntero(JOptionPane.showInputDialog("Creditos:"));
 
@@ -256,9 +273,7 @@ public class MenuVentana {
                     break;
                 case "2":
                     String area = JOptionPane.showInputDialog("Area de interes:");
-                    if (area == null) {
-                        return;
-                    }
+                    if (area == null) return;
                     alumno.agregarAsignatura(new AsignaturaElectiva(nom, cod, cre, area));
                     break;
                 case "3":
@@ -275,18 +290,19 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Busca y muestra los detalles de una asignatura específica en la malla de un alumno.
+     * 
+     * @param alumno El objeto Alumno en el que se realizará la búsqueda.
+     */
     private void buscarAsignaturaMalla(Alumno alumno) {
         String cod = JOptionPane.showInputDialog("Ingrese código a buscar:");
-        if (cod == null || cod.isEmpty()) {
-            return;
-        }
+        if (cod == null || cod.isEmpty()) return;
 
         try {
-            // Intentamos obtener la asignatura
             Asignatura b = alumno.buscarAsignatura(cod);
-
             String info = "Detalles de Asignatura:\n"
-                    + "• Nomb   re: " + b.getNombre() + "\n"
+                    + "• Nombre: " + b.getNombre() + "\n"
                     + "• Créditos: " + b.getCreditos() + "\n"
                     + "• Estado: " + (b.isAprobada() ? "Aprobada" : "Pendiente");
 
@@ -297,16 +313,17 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Elimina una asignatura de la malla de un alumno con confirmación previa del usuario.
+     * 
+     * @param alumno El objeto Alumno del cual se eliminará la asignatura.
+     */
     private void eliminarAsignaturaMalla(Alumno alumno) {
         String cod = JOptionPane.showInputDialog("Código de la asignatura a eliminar:");
-        if (cod == null || cod.isEmpty()) {
-            return;
-        }
+        if (cod == null || cod.isEmpty()) return;
 
         try {
-            // Primero verificamos que exista para dar feedback al usuario
             Asignatura asig = alumno.buscarAsignatura(cod);
-
             int confirm = JOptionPane.showConfirmDialog(null,
                     "¿Seguro que desea eliminar '" + asig.getNombre() + "' de la malla?",
                     "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
@@ -320,16 +337,17 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Modifica el estado de aprobación de una materia inscrita por un alumno.
+     * 
+     * @param alumno El objeto Alumno propietario de la asignatura.
+     */
     private void modificarEstadoAsignatura(Alumno alumno) {
         String cod = JOptionPane.showInputDialog("Ingrese código de la asignatura:");
-        if (cod == null || cod.isEmpty()) {
-            return;
-        }
+        if (cod == null || cod.isEmpty()) return;
 
         try {
-            // Buscamos la asignatura (lanza EntidadNoEncontradaException)
             Asignatura asig = alumno.buscarAsignatura(cod);
-
             int r = JOptionPane.showConfirmDialog(null,
                     "¿Está aprobada la asignatura '" + asig.getNombre() + "'?",
                     "Actualizar Estado", JOptionPane.YES_NO_OPTION);
@@ -342,6 +360,12 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Genera un reporte formateado con toda la malla curricular del alumno y lo muestra
+     * utilizando un componente de texto con barra de desplazamiento (JScrollPane).
+     * 
+     * @param alumno El objeto Alumno cuya malla se desea visualizar.
+     */
     private void mostrarMalla(Alumno alumno) {
         if (alumno.getMalla().isEmpty()) {
             JOptionPane.showMessageDialog(null, "La malla se encuentra vacía.", "Malla Curricular", JOptionPane.INFORMATION_MESSAGE);
@@ -360,14 +384,13 @@ public class MenuVentana {
                 reporte.append("Tipo: Obligatoria\n")
                         .append("Semestre: ").append(ob.getSemestre()).append("\n");
             } else if (a instanceof AsignaturaElectiva) {
-
                 AsignaturaElectiva el = (AsignaturaElectiva) a;
                 reporte.append("Tipo: Electiva\n")
                         .append("Área: ").append(el.getArea()).append("\n");
             }
             reporte.append("----------------------------------\n");
         }
-        // Usamos un JTextArea dentro del Scroll por si el alumno tiene muchas materias
+        
         JTextArea textArea = new JTextArea(reporte.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -375,14 +398,16 @@ public class MenuVentana {
         JOptionPane.showMessageDialog(null, scrollPane, "Malla Curricular", JOptionPane.PLAIN_MESSAGE);
     }
 
+    /**
+     * Inicia el flujo de gestión de las asignaturas dictadas por un profesor.
+     * 
+     * @param registroProfesores Gestor necesario para validar la existencia del profesor.
+     */
     private void gestionarAsignaturasProfesor(RegistroProfesores registroProfesores) {
         String id = JOptionPane.showInputDialog("Ingrese ID del profesor:");
-        if (id == null || id.isEmpty()) {
-            return;
-        }
+        if (id == null || id.isEmpty()) return;
 
         try {
-            // Buscamos al profesor usando el método que ya lanza EntidadNoEncontradaException
             Profesor prof = registroProfesores.buscarProfesor(id);
             ejecutarMenuInternoAsignaturas(prof);
         } catch (EntidadNoEncontradaException e) {
@@ -390,6 +415,11 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Submenú interno de gestión de carga académica para un profesor específico.
+     * 
+     * @param prof Instancia del profesor seleccionado.
+     */
     private void ejecutarMenuInternoAsignaturas(Profesor prof) {
         int opcion;
         do {
@@ -401,28 +431,23 @@ public class MenuVentana {
                     + "5. Volver";
 
             String entrada = JOptionPane.showInputDialog(null, menu);
-            if (entrada == null) {
-                break;
-            }
+            if (entrada == null) break;
             opcion = leerEntero(entrada);
 
             switch (opcion) {
-                case 1:
-                    uiAgregarAsignatura(prof);
-                    break;
-                case 2:
-                    uiMostrarAsignaturas(prof);
-                    break;
-                case 3:
-                    uiEditarAsignatura(prof);
-                    break;
-                case 4:
-                    uiEliminarAsignatura(prof);
-                    break;
+                case 1: uiAgregarAsignatura(prof); break;
+                case 2: uiMostrarAsignaturas(prof); break;
+                case 3: uiEditarAsignatura(prof); break;
+                case 4: uiEliminarAsignatura(prof); break;
             }
         } while (opcion != 5);
     }
 
+    /**
+     * Muestra la lista de materias que dicta un profesor utilizando un panel con scroll.
+     * 
+     * @param prof El objeto Profesor cuya carga académica se visualizará.
+     */
     private void uiMostrarAsignaturas(Profesor prof) {
         List<Asignatura> asignaturas = prof.getAsignaturas();
 
@@ -440,7 +465,6 @@ public class MenuVentana {
                     .append(" (").append(asig.getCreditos()).append(" créditos)\n");
         }
 
-        // Usamos un JTextArea dentro del Scroll por si la lista es muy larga
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -449,19 +473,17 @@ public class MenuVentana {
         JOptionPane.showMessageDialog(null, scrollPane, "Listado de Asignaturas", JOptionPane.PLAIN_MESSAGE);
     }
 
+    /**
+     * Elimina una asignatura de la carga académica de un profesor con confirmación visual.
+     * 
+     * @param prof El objeto Profesor afectado.
+     */
     private void uiEliminarAsignatura(Profesor prof) {
         String codigo = JOptionPane.showInputDialog("Ingrese el código de la asignatura que desea eliminar:");
-
-        // Si el usuario presiona "Cancelar" o cierra la ventana
-        if (codigo == null || codigo.trim().isEmpty()) {
-            return;
-        }
+        if (codigo == null || codigo.trim().isEmpty()) return;
 
         try {
-            // 1. Validamos existencia usando el método que ya lanza EntidadNoEncontradaException
             Asignatura asig = prof.buscarAsignatura(codigo);
-
-            // 2. Confirmación de seguridad
             int confirmar = JOptionPane.showConfirmDialog(null,
                     "¿Está seguro de que desea desvincular la asignatura '" + asig.getNombre() + "'?",
                     "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
@@ -472,41 +494,43 @@ public class MenuVentana {
             }
 
         } catch (EntidadNoEncontradaException e) {
-            // 3. SIA-12: Captura del error y feedback visual
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error al eliminar", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Permite modificar el nombre de una materia dictada por el profesor.
+     * 
+     * @param prof El objeto Profesor afectado.
+     */
     private void uiEditarAsignatura(Profesor prof) {
         String cod = JOptionPane.showInputDialog("Código de la asignatura a editar:");
-        if (cod == null) {
-            return;
-        }
+        if (cod == null) return;
 
         try {
-            // buscarAsignatura(cod) en tu clase Profesor ya lanza la excepción
             Asignatura asig = prof.buscarAsignatura(cod);
-
             String nuevoNombre = JOptionPane.showInputDialog("Nuevo nombre para " + asig.getNombre() + ":");
             if (nuevoNombre != null && !nuevoNombre.isEmpty()) {
                 asig.setNombre(nuevoNombre);
                 JOptionPane.showMessageDialog(null, "Actualización exitosa.");
             }
         } catch (EntidadNoEncontradaException e) {
-            // Capturamos el error y lo mostramos en ventana
             JOptionPane.showMessageDialog(null, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
     }
 
+    /**
+     * Vincula una nueva materia al profesor capturando la información mediante cuadros de texto.
+     * 
+     * @param prof El objeto Profesor al que se le añadirá la carga.
+     */
     private void uiAgregarAsignatura(Profesor prof) {
         try {
             String nom = JOptionPane.showInputDialog("Nombre:");
             String cod = JOptionPane.showInputDialog("Código:");
             String creStr = JOptionPane.showInputDialog("Créditos:");
 
-            if (nom == null || cod == null || creStr == null) {
-                return;
-            }
+            if (nom == null || cod == null || creStr == null) return;
 
             int cre = leerEntero(creStr);
             if (cre <= 0) {
@@ -524,253 +548,218 @@ public class MenuVentana {
     // ==========================================================
     // MÉTODOS EXISTENTES 
     // ==========================================================
+    
+    /**
+     * Captura datos mediante GUI para instanciar y registrar un nuevo alumno.
+     * @param registroAlumnos Gestor encargado de la inserción.
+     */
     private void agregarAlumno(RegistroAlumnos registroAlumnos) {
-        // 1. Pedimos los datos y validamos 
         String id = JOptionPane.showInputDialog("Ingrese ID del alumno:");
-        if (id == null) {
-            return;
-        }
+        if (id == null) return;
 
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del alumno:");
-        if (nombre == null) {
-            return;
-        }
+        if (nombre == null) return;
 
         String carrera = JOptionPane.showInputDialog("Ingrese carrera del alumno:");
-        if (carrera == null) {
-            return;
-        }
+        if (carrera == null) return;
 
-        // 2. Intentar la operación usando el sistema de excepciones (SIA-12)
         try {
-            // Llamamos al método que ahora lanza AtributoInvalidoException
             registroAlumnos.agregarAlumno(id, nombre, carrera);
-
-            // Si el flujo continúa aquí, la inserción fue exitosa
             JOptionPane.showMessageDialog(null, "Alumno agregado correctamente.");
-
         } catch (AtributoInvalidoException e) {
-            // SIA-12: Atrapamos el error y mostramos el mensaje que viene desde la lógica
-            JOptionPane.showMessageDialog(null,
-                    e.getMessage(),
-                    "Error de Registro",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error de Registro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Captura datos para actualizar la información básica de un alumno existente.
+     * @param registroAlumnos Gestor para buscar y procesar la actualización.
+     */
     private void editarAlumno(RegistroAlumnos registroAlumnos) {
         String id = JOptionPane.showInputDialog("ID del alumno a editar:");
-        if (id == null || id.trim().isEmpty()) {
-            return;
-        }
+        if (id == null || id.trim().isEmpty()) return;
 
         String n = JOptionPane.showInputDialog("Nuevo nombre:");
-        if (n == null) {
-            return;
-        }
+        if (n == null) return;
 
         String c = JOptionPane.showInputDialog("Nueva carrera:");
-        if (c == null) {
-            return;
-        }
+        if (c == null) return;
 
         try {
             registroAlumnos.editarAlumno(id, n, c);
             JOptionPane.showMessageDialog(null, "Alumno editado correctamente.");
-
-        } catch (EntidadNoEncontradaException | AtributoInvalidoException e) { // ATRAPAMOS AMBAS EXCEPCIONES AQUÍ
+        } catch (EntidadNoEncontradaException | AtributoInvalidoException e) { 
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error de validación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Remueve a un alumno del sistema tras solicitar su identificador.
+     * @param registroAlumnos Gestor encargado de la eliminación.
+     */
     private void eliminarAlumno(RegistroAlumnos registroAlumnos) {
         String id = JOptionPane.showInputDialog("ID del alumno a eliminar:");
-        // Si el usuario presiona "Cancelar" o cierra la ventana
-        if (id == null || id.trim().isEmpty()) {
-            return;
-        }
+        if (id == null || id.trim().isEmpty()) return;
+        
         try {
-            // La lógica en RegistroAlumnos ahora es 'void' y lanza la excepción si falla
             registroAlumnos.eliminarAlumno(id);
-            // Si el código llega aquí, la eliminación fue exitosa
             JOptionPane.showMessageDialog(null, "Alumno eliminado correctamente.");
         } catch (EntidadNoEncontradaException e) {
-            // Capturamos el mensaje de error ("El alumno con ID ... no existe")
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error de Eliminación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Muestra la información formateada de un alumno localizado por su ID.
+     * @param registroAlumnos Gestor en el cual realizar la búsqueda.
+     */
     private void buscarAlumnoPorId(RegistroAlumnos registroAlumnos) {
         String id = JOptionPane.showInputDialog("Ingrese el ID del alumno a buscar:");
-        // Validación de cancelación
-        if (id == null || id.trim().isEmpty()) {
-            return;
-        }
+        if (id == null || id.trim().isEmpty()) return;
+        
         try {
-            // La lógica lanza EntidadNoEncontradaException si el ID no existe
             Alumno a = registroAlumnos.buscarAlumno(id);
-            // Si lo encuentra, lo muestra usando tu método formatearAlumno
             JOptionPane.showMessageDialog(null, formatearAlumno(a), "Detalles del Alumno", JOptionPane.INFORMATION_MESSAGE);
         } catch (EntidadNoEncontradaException e) {
-            // Si no existe, mostramos el mensaje que viene desde la lógica
             JOptionPane.showMessageDialog(null, e.getMessage(), "Resultado de búsqueda", JOptionPane.WARNING_MESSAGE);
         }
     }
 
+    /**
+     * Busca y muestra los detalles de un alumno mediante coincidencia de nombre y carrera.
+     * @param registroAlumnos Gestor en el cual realizar la búsqueda.
+     */
     private void buscarAlumnoPorNombreYCarrera(RegistroAlumnos registroAlumnos) {
         String n = JOptionPane.showInputDialog("Nombre:");
-        if (n == null) {
-            return;
-        }
+        if (n == null) return;
         String c = JOptionPane.showInputDialog("Carrera:");
-        if (c == null) {
-            return;
-        }
+        if (c == null) return;
 
         try {
             Alumno a = registroAlumnos.buscarAlumno(n, c);
             JOptionPane.showMessageDialog(null, formatearAlumno(a), "Resultado de Búsqueda", JOptionPane.INFORMATION_MESSAGE);
         } catch (EntidadNoEncontradaException e) {
-            // SIA-12: Atrapado correctamente
             JOptionPane.showMessageDialog(null, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
     }
 
+    /**
+     * Recopila y muestra en ventana el listado de alumnos cuyo progreso es menor al indicado.
+     * @param registroAlumnos Gestor que provee la funcionalidad de filtro.
+     */
     private void mostrarAlumnosEnRiesgo(RegistroAlumnos registroAlumnos) {
         String v = JOptionPane.showInputDialog("Porcentaje minimo (ej: 50):");
-        if (v == null) {
-            return;
-        }
+        if (v == null) return;
+        
         double p = Double.parseDouble(v);
         List<Alumno> lista = registroAlumnos.obtenerAlumnosEnRiesgo(p);
         String texto = "ALUMNOS CON PROGRESO MENOR A " + p + "%\n";
+        
         for (Alumno a : lista) {
             texto += "- " + a.getNombre() + " (" + a.calcularProgreso() + "%)\n";
         }
         mostrarMensaje("RIESGO ACADEMICO", texto);
     }
 
+    /**
+     * Captura datos para instanciar y registrar un nuevo profesor en el sistema.
+     * @param registroProfesores Gestor encargado de la inserción.
+     */
     private void agregarProfesor(RegistroProfesores registroProfesores) {
-        // 1. Pedimos los datos 
         String id = JOptionPane.showInputDialog("Ingrese ID del profesor:");
-        if (id == null) {
-            return;
-        }
+        if (id == null) return;
 
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del profesor:");
-        if (nombre == null) {
-            return;
-        }
+        if (nombre == null) return;
 
         String especialidad = JOptionPane.showInputDialog("Ingrese especialidad:");
-        if (especialidad == null) {
-            return;
-        }
+        if (especialidad == null) return;
 
-        // 2. Intentar la operación dentro de un bloque try-catch (SIA-12)
         try {
-            // Llamamos al método que es void y lanza AtributoInvalidoException
             registroProfesores.agregarProfesor(id, nombre, especialidad);
-
-            // Si el código llega a esta línea, significa que no hubo errores
             JOptionPane.showMessageDialog(null, "Profesor registrado exitosamente.");
-
         } catch (AtributoInvalidoException e) {
-            // SIA-12: El manejo de la excepción se hace aquí.
-            // Mostramos el mensaje específico que viene desde la lógica (ID duplicado, campos vacíos, etc.)
-            JOptionPane.showMessageDialog(null,
-                    e.getMessage(),
-                    "Error al registrar",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error al registrar", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Actualiza la información básica de un profesor mediante su ID.
+     * @param registroProfesores Gestor necesario para aplicar los cambios.
+     */
     private void editarProfesor(RegistroProfesores registroProfesores) {
         String id = JOptionPane.showInputDialog("Ingrese ID del profesor a editar:");
-        if (id == null || id.trim().isEmpty()) {
-            return;
-        }
+        if (id == null || id.trim().isEmpty()) return;
 
         String n = JOptionPane.showInputDialog("Nuevo Nombre:");
-        if (n == null) {
-            return;
-        }
+        if (n == null) return;
 
         String e = JOptionPane.showInputDialog("Nueva Especialidad:");
-        if (e == null) {
-            return;
-        }
+        if (e == null) return;
 
         try {
             registroProfesores.editarProfesor(id, n, e);
             JOptionPane.showMessageDialog(null, "Datos actualizados correctamente.");
-        } catch (EntidadNoEncontradaException | AtributoInvalidoException ex) { // ATRAPAMOS AMBAS EXCEPCIONES AQUÍ
+        } catch (EntidadNoEncontradaException | AtributoInvalidoException ex) { 
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de validación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Elimina un profesor del registro mediante su identificador.
+     * @param registroProfesores Gestor que procesará la baja.
+     */
     private void eliminarProfesor(RegistroProfesores registroProfesores) {
         String id = JOptionPane.showInputDialog("Ingrese ID del profesor a eliminar:");
-        if (id == null) {
-            return;
-        }
+        if (id == null) return;
+        
         try {
-            // La lógica ahora es void y lanza excepción si falla
             registroProfesores.eliminarProfesor(id);
             JOptionPane.showMessageDialog(null, "Profesor eliminado del sistema.");
         } catch (EntidadNoEncontradaException e) {
-            // Capturamos el error enviado desde la lógica y lo mostramos como mensaje de error
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error de Eliminación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Localiza y muestra la información de un profesor buscando por su ID.
+     * @param registroProfesores Gestor que realizará la búsqueda.
+     */
     private void buscarProfesorPorId(RegistroProfesores registroProfesores) {
         String id = JOptionPane.showInputDialog("Ingrese ID a buscar:");
-
-        // Si el usuario presiona "Cancelar"
-        if (id == null || id.trim().isEmpty()) {
-            return;
-        }
+        if (id == null || id.trim().isEmpty()) return;
+        
         try {
-            // Intentamos buscar al profesor
             Profesor p = registroProfesores.buscarProfesor(id);
-
-            // Si no lanzó la excepción, es porque lo encontró
             JOptionPane.showMessageDialog(null, formatearProfesor(p), "Resultado de Búsqueda", JOptionPane.INFORMATION_MESSAGE);
-
         } catch (EntidadNoEncontradaException e) {
-            // Capturamos el error si el ID no existe (SIA-12)
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error de Búsqueda", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Localiza y muestra a un profesor utilizando su nombre completo.
+     * @param registroProfesores Gestor que realizará la búsqueda.
+     */
     private void buscarProfesorPorNombre(RegistroProfesores registroProfesores) {
         String n = JOptionPane.showInputDialog("Ingrese nombre completo:");
-        // Si el usuario cancela la entrada
-        if (n == null || n.trim().isEmpty()) {
-            return;
-        }
+        if (n == null || n.trim().isEmpty()) return;
+        
         try {
             Profesor p = registroProfesores.buscarProfesorPorNombre(n);
-            // Si lo encuentra, mostramos la info formateada
-            JOptionPane.showMessageDialog(null,
-                    formatearProfesor(p),
-                    "Resultado de Búsqueda",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, formatearProfesor(p), "Resultado de Búsqueda", JOptionPane.INFORMATION_MESSAGE);
         } catch (EntidadNoEncontradaException e) {
-            // Si no lo encuentra, mostramos el mensaje de la excepción     
-            JOptionPane.showMessageDialog(null,
-                    e.getMessage(),
-                    "Sin Resultados",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Sin Resultados", JOptionPane.WARNING_MESSAGE);
         }
     }
 
+    /**
+     * Imprime un listado de profesores que comparten una misma área de especialidad.
+     * @param registroProfesores Gestor responsable de ejecutar el filtro.
+     */
     private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
         String esp = JOptionPane.showInputDialog("Especialidad:");
-        if (esp == null || esp.trim().isEmpty()) {
-            return;
-        }
+        if (esp == null || esp.trim().isEmpty()) return;
 
         List<Profesor> lista = registroProfesores.obtenerProfesoresPorEspecialidad(esp);
 
@@ -786,12 +775,14 @@ public class MenuVentana {
         mostrarMensaje("ESPECIALIDAD", texto);
     }
 
+    /**
+     * Solicita una carrera y muestra un panel estadístico con el promedio de avance de sus alumnos.
+     * @param registroAlumnos Gestor que realiza el procesamiento de los datos académicos.
+     */
     private void analizarRendimientoCarrera(RegistroAlumnos registroAlumnos) {
         String carrera = JOptionPane.showInputDialog(null, "Ingrese el nombre de la carrera a analizar (ej. Ingenieria en Sistemas):", JOptionPane.QUESTION_MESSAGE);
         
-        if (carrera == null || carrera.trim().isEmpty()) {
-            return;
-        }
+        if (carrera == null || carrera.trim().isEmpty()) return;
 
         try {
             double promedioGlobal = registroAlumnos.calcularRendimientoPromedioCarrera(carrera);
@@ -811,8 +802,16 @@ public class MenuVentana {
     }
 
     // ==========================================================
-    // UTILIDADES
+    // UTILIDADES GRÁFICAS Y FORMATEO
     // ==========================================================
+    
+    /**
+     * Convierte una cadena de texto (String) a un número entero de manera segura.
+     * Evita caídas de la aplicación si el usuario ingresa letras en vez de números.
+     * 
+     * @param entrada Texto ingresado por el usuario en el JOptionPane.
+     * @return El número entero, o -1 si ocurrió un error de formato.
+     */
     private int leerEntero(String entrada) {
         try {
             return Integer.parseInt(entrada);
@@ -821,20 +820,31 @@ public class MenuVentana {
         }
     }
 
+    /**
+     * Muestra bloques de texto largos dentro de un área de texto desplazable (JScrollPane).
+     * Ideal para mostrar reportes o listas extensas en la interfaz gráfica.
+     * 
+     * @param titulo El título de la ventana.
+     * @param contenido El texto extenso a mostrar en el panel.
+     */
     private void mostrarMensaje(String titulo, String contenido) {
-        // 1. Creamos un área de texto donde irá el listado
-        JTextArea textArea = new JTextArea(20, 50); // 20 filas de alto
+        JTextArea textArea = new JTextArea(20, 50); 
         textArea.setText(contenido);
-        textArea.setEditable(false); // Para que no puedan editar el listado
-        textArea.setLineWrap(true);  // Ajuste de línea automático
+        textArea.setEditable(false); 
+        textArea.setLineWrap(true);  
         textArea.setWrapStyleWord(true);
-        textArea.setCaretPosition(0); // Para que siempre empiece arriba de todo
-        // 2. Metemos esa área de texto dentro de un JScrollPane (la barrita)
+        textArea.setCaretPosition(0); 
+        
         JScrollPane scrollPane = new JScrollPane(textArea);
-        // 3. Mostramos el scrollPane en lugar del texto plano
         JOptionPane.showMessageDialog(null, scrollPane, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Genera un String concatenado con la información de todos los alumnos registrados.
+     * 
+     * @param registroAlumnos Gestor de alumnos.
+     * @return Una cadena de texto lista para ser mostrada en pantalla.
+     */
     private String obtenerListadoAlumnos(RegistroAlumnos registroAlumnos) {
         if (registroAlumnos.getAlumnos().isEmpty()) {
             return "No hay alumnos.";
@@ -846,6 +856,12 @@ public class MenuVentana {
         return t;
     }
 
+    /**
+     * Genera un String concatenado con la información de todos los profesores registrados.
+     * 
+     * @param registroProfesores Gestor de profesores.
+     * @return Una cadena de texto lista para ser mostrada en pantalla.
+     */
     private String obtenerListadoProfesores(RegistroProfesores registroProfesores) {
         if (registroProfesores.getProfesores().isEmpty()) {
             return "No hay profesores.";
@@ -857,12 +873,24 @@ public class MenuVentana {
         return t;
     }
 
+    /**
+     * Aplica formato visual a los datos individuales de un Alumno para la GUI.
+     * 
+     * @param alumno El objeto alumno a formatear.
+     * @return Cadena de texto estructurada.
+     */
     private String formatearAlumno(Alumno alumno) {
         return "ID: " + alumno.getId() + " | Nombre: " + alumno.getNombre()
                 + "\nCarrera: " + alumno.getCarrera() + " | Progreso: " + String.format("%.2f", alumno.calcularProgreso()) + "%"
                 + "\n-----------------------------";
     }
 
+    /**
+     * Aplica formato visual a los datos individuales de un Profesor para la GUI.
+     * 
+     * @param profesor El objeto profesor a formatear.
+     * @return Cadena de texto estructurada.
+     */
     private String formatearProfesor(Profesor profesor) {
         return "ID: " + profesor.getId() + " | Nombre: " + profesor.getNombre()
                 + "\nEspecialidad: " + profesor.getEspecialidad() + " | Asignaturas: " + profesor.getAsignaturas().size()
