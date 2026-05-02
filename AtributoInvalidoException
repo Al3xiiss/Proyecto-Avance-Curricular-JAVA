@@ -1,6 +1,18 @@
 package avanceCurricular;
 
+/**
+ * Excepción personalizada utilizada para manejar errores de validación de datos.
+ * Se lanza cuando se intenta registrar o modificar una entidad con información 
+ * incorrecta, como campos vacíos, valores nulos, o identificadores duplicados.
+ */
 public class AtributoInvalidoException extends Exception {
+    
+    /**
+     * Construye una nueva excepción de atributo inválido con el mensaje de detalle especificado.
+     * 
+     * @param mensaje El mensaje que describe específicamente cuál fue el error de validación 
+     *                (ej. "El ID no puede estar vacío" o "El alumno ya existe").
+     */
     public AtributoInvalidoException(String mensaje) {
         super(mensaje);
     }
