@@ -3,6 +3,11 @@ package avanceCurricular;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Clase de utilidad encargada de la persistencia de datos en archivos de texto.
+ * Implementa un sistema de procesamiento Batch que carga toda la información al 
+ * iniciar la aplicación y la guarda completamente al finalizar (SIA-11).
+ */
 public class PersistenciaData {
 
     private static final String ARCHIVO_ALUMNOS = "alumnos.txt";
@@ -10,6 +15,14 @@ public class PersistenciaData {
     private static final String ASIG_ALUMNOS = "asignaturas_alumnos.txt";
     private static final String ASIG_PROFESORES = "asignaturas_profesores.txt";
 
+    /**
+     * Ejecuta la carga secuencial de todos los archivos del sistema.
+     * Primero carga las entidades base (Alumnos y Profesores) y luego vincula 
+     * sus respectivas asignaturas.
+     * 
+     * @param ra Registro de alumnos donde se cargarán los datos.
+     * @param rp Registro de profesores donde se cargarán los datos.
+     */
     public static void cargarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
         cargarAlumnos(ra);
         cargarProfesores(rp);
@@ -18,6 +31,13 @@ public class PersistenciaData {
         System.out.println("Datos y asignaturas cargados correctamente.");
     }
 
+    /**
+     * Lee el archivo de alumnos y los registra en el sistema.
+     * Si el archivo no existe, genera datos semilla iniciales para permitir 
+     * la ejecución inmediata (SIA-3).
+     * 
+     * @param ra Registro de alumnos receptor.
+     */
     private static void cargarAlumnos(RegistroAlumnos ra) {
         File file = new File(ARCHIVO_ALUMNOS);
         
@@ -36,7 +56,6 @@ public class PersistenciaData {
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String[] partes = sc.nextLine().split(";");
-                // Capturamos la excepción específica que lanza agregarAlumno
                 if (partes.length == 3) ra.agregarAlumno(partes[0], partes[1], partes[2]);
             }
         } catch (IOException | AtributoInvalidoException e) { 
@@ -44,6 +63,12 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Lee el archivo de profesores y los registra en el sistema.
+     * Si el archivo no existe, genera datos semilla iniciales (SIA-3).
+     * 
+     * @param rp Registro de profesores receptor.
+     */
     private static void cargarProfesores(RegistroProfesores rp) {
         File file = new File(ARCHIVO_PROFESORES);
         if (!file.exists()) {
@@ -65,6 +90,13 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Carga las mallas curriculares de los alumnos desde el archivo correspondiente.
+     * Reconstruye los objetos de tipo {@link AsignaturaObligatoria} o {@link AsignaturaElectiva}
+     * y los asocia al alumno correspondiente mediante su ID.
+     * 
+     * @param ra Registro de alumnos que contiene las instancias a las que se vincularán las materias.
+     */
     public static void cargarAsignaturasAlumnos(RegistroAlumnos ra) {
         File file = new File(ASIG_ALUMNOS);
         if (!file.exists()) {
@@ -101,6 +133,12 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Carga las asignaturas dictadas por los profesores desde el archivo correspondiente.
+     * Vincula cada materia con el profesor encargado mediante su identificador.
+     * 
+     * @param rp Registro de profesores que contiene las instancias de los docentes.
+     */
     public static void cargarAsignaturasProfesores(RegistroProfesores rp) {
         File file = new File(ASIG_PROFESORES);
         if (!file.exists()) {
@@ -131,7 +169,13 @@ public class PersistenciaData {
         }
     }
 
-    // Los métodos de guardado se mantienen igual ya que solo lanzan IOException (ya manejada)
+    /**
+     * Coordina el guardado masivo de toda la información presente en memoria hacia los archivos físicos.
+     * Se invoca usualmente al cerrar la aplicación.
+     * 
+     * @param ra Registro de alumnos a persistir.
+     * @param rp Registro de profesores a persistir.
+     */
     public static void guardarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
         guardarAlumnos(ra);
         guardarProfesores(rp);
@@ -140,6 +184,11 @@ public class PersistenciaData {
         System.out.println(" Todos los cambios han sido guardados.");
     }
 
+    /**
+     * Escribe la lista de alumnos en el archivo de texto usando formato delimitado por punto y coma.
+     * 
+     * @param ra Registro de alumnos fuente.
+     */
     private static void guardarAlumnos(RegistroAlumnos ra) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARCHIVO_ALUMNOS))) {
             for (Alumno a : ra.getAlumnos().values()) {
@@ -150,6 +199,11 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Escribe la lista de profesores en el archivo de texto.
+     * 
+     * @param rp Registro de profesores fuente.
+     */
     private static void guardarProfesores(RegistroProfesores rp) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARCHIVO_PROFESORES))) {
             for (Profesor p : rp.getProfesores().values()) {
@@ -160,6 +214,11 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Recorre cada alumno y sus respectivas mallas para guardar los detalles de las asignaturas.
+     * 
+     * @param ra Registro de alumnos fuente.
+     */
     private static void guardarAsignaturasAlumnos(RegistroAlumnos ra) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(ASIG_ALUMNOS))) {
             for (Alumno a : ra.getAlumnos().values()) {
@@ -179,6 +238,11 @@ public class PersistenciaData {
         }
     }
 
+    /**
+     * Recorre cada profesor y guarda las asignaturas que tiene vinculadas académicamente.
+     * 
+     * @param rp Registro de profesores fuente.
+     */
     private static void guardarAsignaturasProfesores(RegistroProfesores rp) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(ASIG_PROFESORES))) {
             for (Profesor p : rp.getProfesores().values()) {
