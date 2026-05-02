@@ -8,7 +8,7 @@ public class Profesor {
     private String id;
     private String nombre;
     private String especialidad;
-    private List<Asignatura> asignaturas;
+    private final List<Asignatura> asignaturas;
 
     // CONSTRUCTOR
     public Profesor(String id, String nombre, String especialidad) {
@@ -43,33 +43,48 @@ public class Profesor {
         this.especialidad = especialidad;
     }
 
+
     public List<Asignatura> getAsignaturas() {
-        return asignaturas;
+        return new ArrayList<>(this.asignaturas);
     }
 
     public void setAsignaturas(List<Asignatura> asignaturas) {
-        this.asignaturas = asignaturas;
+        if (asignaturas != null) {
+            this.asignaturas.clear();
+            this.asignaturas.addAll(asignaturas);
+        }
     }
 
     // MÉTODOS FUNCIONALES
-    public void asignarAsignatura(Asignatura asignatura) {
-        if (asignatura != null) {
+    public void asignarAsignatura(Asignatura asignatura) throws AtributoInvalidoException {
+        try {
+            if (asignatura == null) {
+                throw new AtributoInvalidoException("Error: No se puede asignar una asignatura nula.");
+            }
+
+            if (tieneAsignatura(asignatura.getCodigo())) {
+                throw new AtributoInvalidoException("Error: El profesor ya tiene asignada la asignatura con código " + asignatura.getCodigo());
+            }
+
             asignaturas.add(asignatura);
+            
+        } catch (AtributoInvalidoException e) {
+            // Relanzamos para que la capa superior maneje el error
+            throw e;
         }
     }
 
-    public void eliminarAsignatura(String codigo) {
-        if (codigo == null) {
-            return;
-        }
-
-        for (int i = 0; i < asignaturas.size(); i++) {
-            Asignatura asignatura = asignaturas.get(i);
-
-            if (asignatura.getCodigo().equalsIgnoreCase(codigo)) {
-                asignaturas.remove(i);
-                break;
-            }
+    // ELIMINAR ASIGNATURA (SIA-12)
+    public void eliminarAsignatura(String codigo) throws EntidadNoEncontradaException {
+        // SIA-12: Bloque try-catch explícito en la entidad
+        try {
+            // Reutilizamos buscarAsignatura,que LANZA la excepción si no la encuentra
+            Asignatura asig = buscarAsignatura(codigo); 
+            asignaturas.remove(asig); 
+            
+        } catch (EntidadNoEncontradaException e) {
+            // Se atrapa la excepción de la búsqueda y se relanza
+            throw e;
         }
     }
 
@@ -83,17 +98,21 @@ public class Profesor {
                 return true;
             }
         }
-
         return false;
     }
 
     public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
-        for (Asignatura a : asignaturas) {
-            if (a.getCodigo().equalsIgnoreCase(codigo)) {
-                return a;
+        try {
+            for (Asignatura a : asignaturas) {
+                if (a.getCodigo().equalsIgnoreCase(codigo)) {
+                    return a;
+                }
             }
+            throw new EntidadNoEncontradaException("Error: La asignatura con código " + codigo + " no existe para este profesor.");
+        } catch (EntidadNoEncontradaException e) {
+            // SIA-12: Captura y relanza internamente
+            throw e;
         }
-        throw new EntidadNoEncontradaException("Error: La asignatura con código " + codigo + " no existe para este profesor.");
     }
 
     public void mostrarInfo() {
