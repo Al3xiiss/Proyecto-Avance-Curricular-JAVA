@@ -9,33 +9,47 @@ public class Main {
         RegistroProfesores registroProfesores = new RegistroProfesores();
 
         // 2. SIA-11: CARGA BATCH AL INICIAR
-        // Carga alumnos, profesores y todas sus asignaturas desde los .txt
+        System.out.println("Iniciando sistema... Cargando archivos base.");
         PersistenciaData.cargarTodo(registroAlumnos, registroProfesores);
 
-        // 3. Selección del modo de ejecución
-        String opcion = JOptionPane.showInputDialog(
-                null,
-                "Seleccione el modo de ejecucion:\n1. Consola\n2. Ventana",
-                "Sistema Academico - Avance Curricular",
-                JOptionPane.QUESTION_MESSAGE
-        );
+        // 3. Selección del modo de ejecución (Con ciclo de validación)
+        boolean seleccionValida = false;
 
-        // 4. Lógica de flujo según la opción elegida
-        if (opcion == null) {
-            JOptionPane.showMessageDialog(null, "La aplicacion fue cerrada.");
-        } else if (opcion.equals("1")) {
-            MenuConsola menuConsola = new MenuConsola();
-            menuConsola.mostrarMenu(registroAlumnos, registroProfesores);
-        } else if (opcion.equals("2")) {
-            MenuVentana menuVentana = new MenuVentana();
-            menuVentana.mostrarMenu(registroAlumnos, registroProfesores);
-        } else {
-            JOptionPane.showMessageDialog(null, "Opcion invalida.");
+        while (!seleccionValida) {
+            // Declaramos la variable justo donde se usa para evitar la advertencia
+            String opcion = JOptionPane.showInputDialog(
+                    null,
+                    "Seleccione el modo de ejecucion:\n1. Consola\n2. Ventana",
+                    "Sistema Academico - Avance Curricular",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            // Validamos primero el null para que el switch no explote si el usuario cancela
+            if (opcion == null) {
+                JOptionPane.showMessageDialog(null, "La aplicacion fue cerrada.");
+                seleccionValida = true; // Salimos del ciclo para ir al guardado y cierre
+            } else {
+                // Convertimos la cadena de if-else en un switch limpio
+                switch (opcion) {
+                    case "1":
+                        MenuConsola menuConsola = new MenuConsola();
+                        menuConsola.mostrarMenu(registroAlumnos, registroProfesores);
+                        seleccionValida = true;
+                        break;
+                    case "2":
+                        MenuVentana menuVentana = new MenuVentana();
+                        menuVentana.mostrarMenu(registroAlumnos, registroProfesores);
+                        seleccionValida = true;
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Opción inválida. Por favor ingrese 1 o 2.", "Error", JOptionPane.WARNING_MESSAGE);
+                        break;
+                }
+            }
         }
 
-        // 5. SIA-11: GUARDADO BATCH AL SALIR
-        // Antes de que el programa muera, guardamos todos los cambios realizados
-        System.out.println("Guardando cambios en archivos...");
+        // 4. SIA-11: GUARDADO BATCH AL SALIR
+        System.out.println("\nGuardando cambios en archivos...");
         PersistenciaData.guardarTodo(registroAlumnos, registroProfesores);
         
         System.out.println("Cierre seguro completado.");
