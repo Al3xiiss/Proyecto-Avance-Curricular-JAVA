@@ -5,20 +5,23 @@ import java.util.*;
 public class RegistroProfesores {
 
     // ATRIBUTO
-    private Map<String, Profesor> profesores;
+    private final Map<String, Profesor> profesores;
 
     // CONSTRUCTOR
     public RegistroProfesores() {
         this.profesores = new HashMap<>();
     }
 
-    // GETTER Y SETTER
+    // GETTER
     public Map<String, Profesor> getProfesores() {
-        return profesores;
+        return new HashMap<>(this.profesores);
     }
 
     public void setProfesores(Map<String, Profesor> profesores) {
-        this.profesores = profesores;
+        if (profesores != null) {
+            this.profesores.clear();
+            this.profesores.putAll(profesores);
+        }
     }
 
     // INSERCIÓN
