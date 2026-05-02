@@ -1,22 +1,51 @@
 package avanceCurricular;
 
+/**
+ * Representa una asignatura de carácter obligatorio dentro de la malla curricular.
+ * Hereda los atributos básicos de la clase abstracta {@link Asignatura} y añade
+ * una propiedad específica para indicar en qué semestre o nivel debe ser cursada.
+ */
 public class AsignaturaObligatoria extends Asignatura {
 
     private int semestre;
 
+    /**
+     * Construye una nueva asignatura obligatoria con sus datos básicos y su semestre correspondiente.
+     * Invoca al constructor de la superclase para inicializar el nombre, código y créditos.
+     * 
+     * @param nombre El nombre descriptivo de la asignatura obligatoria.
+     * @param codigo El código único de la materia.
+     * @param creditos Los créditos académicos que aporta.
+     * @param semestre El número del semestre o nivel en el que se dicta (ej. 1, 2, 3...).
+     */
     public AsignaturaObligatoria(String nombre, String codigo, int creditos, int semestre) {
         super(nombre, codigo, creditos);
         this.semestre = semestre;
     }
 
+    /**
+     * Obtiene el semestre en el que se debe cursar la asignatura.
+     * 
+     * @return El número del semestre.
+     */
     public int getSemestre() {
         return semestre;
     }
 
+    /**
+     * Modifica el semestre de la asignatura obligatoria.
+     * 
+     * @param semestre El nuevo número de semestre a asignar.
+     */
     public void setSemestre(int semestre) {
         this.semestre = semestre;
     }
 
+    /**
+     * Imprime por consola los detalles específicos de la asignatura obligatoria.
+     * Sobreescribe el método abstracto de la clase padre para incluir el "Tipo" 
+     * y el "Semestre" en la salida visual.
+     */
     @Override
     public void mostrarInfo() {
 
