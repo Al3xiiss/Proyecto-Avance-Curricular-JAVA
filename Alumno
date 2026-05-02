@@ -7,7 +7,7 @@ public class Alumno {
     private String id;
     private String nombre;
     private String carrera;
-    private List<Asignatura> malla;
+    private final List<Asignatura> malla;
 
     // Constructor
     public Alumno(String id, String nombre, String carrera) {
@@ -19,8 +19,6 @@ public class Alumno {
 
 
     // GETTERS Y SETTERS (SIA-3 )
-
-
     public String getId() {
         return id;
     }
@@ -46,45 +44,80 @@ public class Alumno {
     }
 
     public List<Asignatura> getMalla() {
-        return malla;
+        return new ArrayList<>(this.malla);
     }
 
     public void setMalla(List<Asignatura> malla) {
-        this.malla = malla;
+        if (malla != null) {
+            this.malla.clear();
+            this.malla.addAll(malla);
+        }
     }
 
     // MÉTODOS FUNCIONALES
 
-    //  Agregar asignatura 
-    public void agregarAsignatura(Asignatura asignatura) {
-        if (asignatura != null) {
-            malla.add(asignatura);
+    // Agregar asignatura (Actualizado para SIA-7)
+    public void agregarAsignatura(Asignatura asig) throws AtributoInvalidoException {
+        try {
+            if (asig == null) throw new AtributoInvalidoException("Asignatura nula.");
+            if (tieneAsignatura(asig.getCodigo())) {
+                throw new AtributoInvalidoException("La asignatura " + asig.getCodigo() + " ya existe.");
+            }
+            malla.add(asig);
+        } catch (AtributoInvalidoException e) { throw e; }
+    }
+
+    // Crear y agregar asignatura directamente
+    // SOBRECARGA (SIA-5 y SIA-12)
+    public void agregarAsignatura(String nombre, String codigo, int creditos) throws AtributoInvalidoException {
+        try {
+            // Se crea la instancia y se intenta agregar
+            Asignatura nueva = new AsignaturaObligatoria(nombre, codigo, creditos, 1);
+            
+            // Reutiliza la lógica de validación del método agregarAsignatura(Asignatura)
+            // que ya tiene implementado su propio manejo de excepciones
+            agregarAsignatura(nueva); 
+            
+        } catch (AtributoInvalidoException e) {
+            // Se atrapa y se relanza 
+            throw e;
         }
     }
 
-    //  SOBRECARGA (SIA-5)
-    // Crear y agregar asignatura directamente
-    public void agregarAsignatura(String nombre, String codigo, int creditos) {
-        Asignatura nueva = new AsignaturaObligatoria(nombre, codigo, creditos, 1);
-        malla.add(nueva);
-    }
-
-    // Busca una asignatura por su código en la malla
-    public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
+    // Método auxiliar para buscar duplicados
+    public boolean tieneAsignatura(String codigo) {
+        if (codigo == null) return false;
         for (Asignatura a : malla) {
             if (a.getCodigo().equalsIgnoreCase(codigo)) {
-                return a;
+                return true;
             }
-        }   
-        throw new EntidadNoEncontradaException("Error: La asignatura con codigo " + codigo + " no existe en la malla de este alumno.");
+        }
+        return false;
+    } 
+    
+    // Busca una asignatura por su código en la malla
+    public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
+        try {
+            for (Asignatura a : malla) {
+                if (a.getCodigo().equalsIgnoreCase(codigo)) return a;
+            }
+            throw new EntidadNoEncontradaException("Asignatura no encontrada: " + codigo);
+        } catch (EntidadNoEncontradaException e) { throw e; }
     }
 
     // Elimina una asignatura por su código
     public void eliminarAsignatura(String codigo) throws EntidadNoEncontradaException {
-        // Usamos el método buscarAsignatura que ya creamos (que lanza la excepción)// Si la asignatura no existe, esta línea lanzará el error y el método se detendrá aquí
-        Asignatura a = buscarAsignatura(codigo);
-        malla.remove(a);
-    } 
+        // SIA-12: Bloque try-catch explícito en la entidad
+        try {
+            // Reutilizamos buscarAsignatura, que LANZA la excepción si no la encuentra
+            Asignatura asig = buscarAsignatura(codigo); 
+            malla.remove(asig); 
+            
+        } catch (EntidadNoEncontradaException e) {
+            // Se atrapa la excepción de la búsqueda y se relanza
+            throw e;
+        }
+    }
     
     //  Calcular progreso curricular (SIA-9)
     public double calcularProgreso() {
@@ -106,7 +139,7 @@ public class Alumno {
         return (double) creditosAprobados / totalCreditos * 100;
     }
 
-    //  Funcionalidad útil extra (SIA-9)
+    //  Funcionalidad útil extra 
     public List<Asignatura> obtenerAsignaturasPendientes() {
         List<Asignatura> pendientes = new ArrayList<>();
 
@@ -115,7 +148,6 @@ public class Alumno {
                 pendientes.add(a);
             }
         }
-
         return pendientes;
     }
 
