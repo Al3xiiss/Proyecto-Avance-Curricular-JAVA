@@ -2,19 +2,35 @@ package avanceCurricular;
 
 import java.util.*;
 
+/**
+ * Clase encargada de gestionar la Interfaz de Usuario por Línea de Comandos (CLI).
+ * Actúa como intermediaria entre el usuario y la lógica de negocio (Registros),
+ * capturando entradas, validando formatos y atrapando excepciones para evitar cierres inesperados.
+ */
 public class MenuConsola {
 
     private final Scanner scanner;
 
+    /**
+     * Constructor de la clase MenuConsola.
+     * Inicializa el objeto Scanner para capturar la entrada del teclado por consola.
+     */
     public MenuConsola() {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Muestra el menú principal de la aplicación y gestiona el flujo inicial.
+     * Permite derivar la navegación hacia la gestión de alumnos o de profesores.
+     * 
+     * @param registroAlumnos Gestor en memoria de la base de datos de alumnos.
+     * @param registroProfesores Gestor en memoria de la base de datos de profesores.
+     */
     public void mostrarMenu(RegistroAlumnos registroAlumnos, RegistroProfesores registroProfesores) {
         int opcion;
 
         do {
-            limpiarPantalla(); // Limpia todo el texto anterior
+            limpiarPantalla(); 
 
             System.out.println("\n========== MENU PRINCIPAL ==========");
             System.out.println("1. Gestionar alumnos");
@@ -37,6 +53,7 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
+            
             if (opcion != 3) {
                 pausar();
             }
@@ -44,11 +61,16 @@ public class MenuConsola {
         } while (opcion != 3);
     }
 
+    /**
+     * Despliega el submenú dedicado a las operaciones CRUD y lógicas de la entidad Alumno.
+     * 
+     * @param registroAlumnos Instancia del gestor de alumnos para ejecutar las operaciones.
+     */
     private void menuAlumnos(RegistroAlumnos registroAlumnos) {
         int opcion;
 
         do {
-            limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+            limpiarPantalla(); 
 
             System.out.println("\n========== MENU ALUMNOS ==========");
             System.out.println("1. Agregar alumno");
@@ -99,7 +121,7 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
-            // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+            
             if (opcion != 10) {
                 pausar();
             }
@@ -107,11 +129,16 @@ public class MenuConsola {
         } while (opcion != 10);
     }
 
+    /**
+     * Despliega el submenú dedicado a las operaciones CRUD y lógicas de la entidad Profesor.
+     * 
+     * @param registroProfesores Instancia del gestor de profesores para ejecutar las operaciones.
+     */
     private void menuProfesores(RegistroProfesores registroProfesores) {
         int opcion;
 
         do {
-            limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+            limpiarPantalla(); 
 
             System.out.println("\n========== MENU PROFESORES ==========");
             System.out.println("1. Agregar profesor");
@@ -158,7 +185,7 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
-            // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+            
             if (opcion != 9) {
                 pausar();
             }
@@ -166,17 +193,25 @@ public class MenuConsola {
         } while (opcion != 9);
     }
 
+    // ==========================================================
+    // MENÚS ANIDADOS: GESTIÓN DE ASIGNATURAS
+    // ==========================================================
+
+    /**
+     * Submenú interactivo para gestionar la carga académica dictada por un profesor específico.
+     * 
+     * @param registroProfesores Gestor necesario para buscar al profesor en memoria.
+     */
     private void gestionarAsignaturasProfesor(RegistroProfesores registroProfesores) {
         System.out.print("\nIngrese ID del profesor para gestionar sus asignaturas: ");
         String id = leerTexto();
 
         try {
-            // Buscamos al profesor usando el método del registro que ya lanza excepción
             Profesor profesor = registroProfesores.buscarProfesor(id);
             int opcion;
 
             do {
-                limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+                limpiarPantalla(); 
 
                 System.out.println("\n--- ASIGNATURAS DICTADAS POR: " + profesor.getNombre().toUpperCase() + " ---");
                 System.out.println("1. Agregar nueva Asignatura");
@@ -211,18 +246,81 @@ public class MenuConsola {
                     default:
                         System.out.println("Opción inválida.");
                 }
-                // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+                
                 if (opcion != 6) {
                     pausar();
                 }
             } while (opcion != 6);
 
         } catch (EntidadNoEncontradaException e) {
-            // Atrapa el error si el ID del profesor no existe
             System.out.println(e.getMessage());
-            pausar(); // Para que el usuario alcance a leer el error
+            pausar(); 
         }
     }
+
+    /**
+     * Submenú interactivo para gestionar la malla curricular de un alumno específico.
+     * 
+     * @param registroAlumnos Gestor necesario para buscar al alumno en memoria.
+     */
+    private void gestionarAsignaturasAlumno(RegistroAlumnos registroAlumnos) {
+        System.out.print("\nIngrese ID del alumno para gestionar su malla: ");
+        String id = leerTexto();
+
+        try {
+            Alumno alumno = registroAlumnos.buscarAlumno(id);
+            int opcion;
+
+            do {
+                limpiarPantalla(); 
+
+                System.out.println("\n--- GESTION DE ASIGNATURAS: " + alumno.getNombre().toUpperCase() + " ---");
+                System.out.println("1. Agregar Asignatura");
+                System.out.println("2. Mostrar Malla Curricular");
+                System.out.println("3. Modificar Estado (Aprobada/Pendiente)");
+                System.out.println("4. Eliminar Asignatura");
+                System.out.println("5. Buscar Asignatura por Código");
+                System.out.println("6. Volver al menú de alumnos");
+                System.out.print("Seleccione una opcion: ");
+
+                opcion = leerEntero();
+
+                switch (opcion) {
+                    case 1:
+                        agregarAsignaturaMalla(alumno);
+                        break;
+                    case 2:
+                        mostrarMallaAlumno(alumno);
+                        break;
+                    case 3:
+                        modificarEstadoAsignatura(alumno);
+                        break;
+                    case 4:
+                        eliminarAsignaturaMalla(alumno);
+                        break;
+                    case 5:
+                        buscarAsignaturaMalla(alumno);
+                        break;
+                    case 6:
+                        System.out.println("Regresando...");
+                        break;
+                    default:
+                        System.out.println("Opcion no valida.");
+                }
+                if (opcion != 6) {
+                    pausar(); 
+                }
+            } while (opcion != 6);
+
+        } catch (EntidadNoEncontradaException e) {
+            System.out.println(e.getMessage());
+            pausar(); 
+        }
+    }
+
+    // ==========================================================
+    // OPERACIONES CRUD: ASIGNATURAS PROFESORES
+    // ==========================================================
 
     private void asignarNuevaAsignatura(Profesor profesor) {
         System.out.println("\nTipo: 1. Obligatoria | 2. Electiva");
@@ -265,7 +363,7 @@ public class MenuConsola {
         System.out.print("Ingrese código de la asignatura a editar: ");
         String codEdit = leerTexto();
         try {
-            Asignatura asigEdit = profesor.buscarAsignatura(codEdit); // Lanza excepción si no está
+            Asignatura asigEdit = profesor.buscarAsignatura(codEdit); 
             System.out.print("Nuevo nombre para la asignatura: ");
             asigEdit.setNombre(leerTexto());
             System.out.println("Nombre actualizado.");
@@ -278,7 +376,6 @@ public class MenuConsola {
         System.out.print("Ingrese código de la asignatura a quitar: ");
         String codDel = leerTexto();
         try {
-            // Primero verificamos que exista para lanzar la excepción si no
             profesor.buscarAsignatura(codDel);
             profesor.eliminarAsignatura(codDel);
             System.out.println("Asignatura eliminada de la carga académica.");
@@ -298,61 +395,9 @@ public class MenuConsola {
         }
     }
 
-    private void gestionarAsignaturasAlumno(RegistroAlumnos registroAlumnos) {
-        System.out.print("\nIngrese ID del alumno para gestionar su malla: ");
-        String id = leerTexto();
-
-        try {
-            // Buscamos al alumno (lanza excepción si no existe)
-            Alumno alumno = registroAlumnos.buscarAlumno(id);
-            int opcion;
-
-            do {
-                limpiarPantalla(); // LIMPIA
-
-                System.out.println("\n--- GESTION DE ASIGNATURAS: " + alumno.getNombre().toUpperCase() + " ---");
-                System.out.println("1. Agregar Asignatura");
-                System.out.println("2. Mostrar Malla Curricular");
-                System.out.println("3. Modificar Estado (Aprobada/Pendiente)");
-                System.out.println("4. Eliminar Asignatura");
-                System.out.println("5. Buscar Asignatura por Código");
-                System.out.println("6. Volver al menú de alumnos");
-                System.out.print("Seleccione una opcion: ");
-
-                opcion = leerEntero();
-
-                switch (opcion) {
-                    case 1:
-                        agregarAsignaturaMalla(alumno);
-                        break;
-                    case 2:
-                        mostrarMallaAlumno(alumno);
-                        break;
-                    case 3:
-                        modificarEstadoAsignatura(alumno);
-                        break;
-                    case 4:
-                        eliminarAsignaturaMalla(alumno);
-                        break;
-                    case 5:
-                        buscarAsignaturaMalla(alumno);
-                        break;
-                    case 6:
-                        System.out.println("Regresando...");
-                        break;
-                    default:
-                        System.out.println("Opcion no valida.");
-                }
-                if (opcion != 6) {
-                    pausar(); // PAUSA
-                }
-            } while (opcion != 6);
-
-        } catch (EntidadNoEncontradaException e) {
-            System.out.println(e.getMessage());
-            pausar(); // Por buena práctica pausar aquí también por si el ID no existía
-        }
-    }
+    // ==========================================================
+    // OPERACIONES CRUD: ASIGNATURAS ALUMNOS
+    // ==========================================================
 
     private void agregarAsignaturaMalla(Alumno alumno) {
         System.out.println("\nTipo de asignatura: 1. Obligatoria | 2. Electiva | 3. Obligatoria Rápida (Semestre 1)");
@@ -364,7 +409,6 @@ public class MenuConsola {
         System.out.print("Creditos: ");
         int cre = leerEntero();
 
-        // AJUSTE 2: Eliminación de la variable booleana "exito" y uso de try-catch
         try {
             switch (tipo) {
                 case 1:
@@ -384,11 +428,9 @@ public class MenuConsola {
                     System.out.println("Opción inválida.");
                     return;
             }
-            // Si el bloque try finaliza sin errores, se imprime el éxito
             System.out.println("Asignatura agregada con éxito a la malla.");
 
         } catch (AtributoInvalidoException e) {
-            // El mensaje de "Ya existe" o "Datos nulos" viene directamente de la lógica
             System.out.println(e.getMessage());
         }
     }
@@ -441,6 +483,10 @@ public class MenuConsola {
         }
     }
 
+    // ==========================================================
+    // OPERACIONES CRUD: ALUMNOS Y PROFESORES PRINCIPALES
+    // ==========================================================
+
     private void agregarAlumno(RegistroAlumnos registroAlumnos) {
         System.out.print("Ingrese ID del alumno Formato(A001): ");
         String id = leerTexto();
@@ -450,12 +496,9 @@ public class MenuConsola {
         String carrera = leerTexto();
 
         try {
-            // Se llama al método que ahora lanza AtributoInvalidoException
             registroAlumnos.agregarAlumno(id, nombre, carrera);
             System.out.println("Alumno agregado correctamente.");
-
         } catch (AtributoInvalidoException e) {
-            // SIA-12: El manejo de la excepción permite informar exactamente qué falló
             System.out.println(e.getMessage());
         }
     }
@@ -464,7 +507,7 @@ public class MenuConsola {
         System.out.print("Ingrese ID del alumno a editar: ");
         String id = leerTexto();
         System.out.print("Ingrese nuevo nombre: ");
-        String nuevoNombre = leerTexto(); // Aunque leerTexto() evita vacíos por consola, por buena práctica lo valida de todas formas.
+        String nuevoNombre = leerTexto(); 
         System.out.print("Ingrese nueva carrera: ");
         String nuevaCarrera = leerTexto();
         try {
@@ -507,7 +550,6 @@ public class MenuConsola {
             Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
             alumno.mostrarInfo();
         } catch (EntidadNoEncontradaException e) {
-            // SIA-12: Atrapado correctamente
             System.out.println(e.getMessage());
         }
     }
@@ -527,12 +569,9 @@ public class MenuConsola {
         String especialidad = leerTexto();
 
         try {
-            // Se llama al método que ahora lanza AtributoInvalidoException
             registroProfesores.agregarProfesor(id, nombre, especialidad);
             System.out.println("Profesor agregado correctamente.");
-
         } catch (AtributoInvalidoException e) {
-            // SIA-12: Captura el error (ID duplicado o campos vacíos) y muestra el mensaje descriptivo
             System.out.println(e.getMessage());
         }
     }
@@ -569,14 +608,10 @@ public class MenuConsola {
         String id = leerTexto();
 
         try {
-            // Ahora confiamos en que buscarProfesor lanza EntidadNoEncontradaException
             Profesor profesor = registroProfesores.buscarProfesor(id);
-
             System.out.println("\n--- PROFESOR ENCONTRADO ---");
             profesor.mostrarInfo();
-
         } catch (EntidadNoEncontradaException e) {
-            // Si no existe, se salta el mostrarInfo y viene directo aquí
             System.out.println(e.getMessage());
         }
     }
@@ -631,6 +666,13 @@ public class MenuConsola {
     // ==========================================================
     // MÉTODOS DE VALIDACIÓN
     // ==========================================================
+    
+    /**
+     * Solicita y valida la entrada de texto por teclado.
+     * Evita que el usuario ingrese campos vacíos o cadenas que contengan únicamente números.
+     * 
+     * @return Un String validado y sin espacios al inicio o al final.
+     */
     private String leerTexto() {
         while (true) {
             String entrada = scanner.nextLine().trim();
@@ -646,6 +688,12 @@ public class MenuConsola {
         }
     }
 
+    /**
+     * Solicita y valida la entrada de un número entero por teclado.
+     * Atrapa excepciones de formato (letras en lugar de números).
+     * 
+     * @return Un valor entero validado.
+     */
     private int leerEntero() {
         while (true) {
             try {
@@ -657,6 +705,12 @@ public class MenuConsola {
         }
     }
 
+    /**
+     * Solicita y valida la entrada de un número decimal (Double) por teclado.
+     * Atrapa excepciones de formato de número.
+     * 
+     * @return Un valor double validado.
+     */
     private double leerDouble() {
         while (true) {
             try {
@@ -671,16 +725,24 @@ public class MenuConsola {
     // ==========================================================
     // UTILIDADES DE CONSOLA (Optimizadas para NetBeans)
     // ==========================================================
+    
+    /**
+     * Limpia visualmente la consola imprimiendo saltos de línea.
+     * Diseñado para funcionar de manera estable dentro de entornos IDE como NetBeans.
+     */
     private void limpiarPantalla() {
-        // La técnica estándar es imprimir suficientes saltos de línea para "limpiar" la vista.
         for (int i = 0; i < 50; i++) {
             System.out.println();
         }
     }
 
+    /**
+     * Pausa la ejecución del programa requiriendo que el usuario presione la tecla ENTER.
+     * Permite que el usuario tenga tiempo de leer mensajes de éxito o error antes de recargar el menú.
+     */
     private void pausar() {
         System.out.println("\n------------------------------------------------");
         System.out.println("Presione ENTER para continuar...");
-        scanner.nextLine(); // Pausa la ejecución hasta que se detecte el Enter
+        scanner.nextLine(); 
     }
 }
