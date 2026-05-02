@@ -4,7 +4,7 @@ import java.util.*;
 
 public class MenuConsola {
 
-    private Scanner scanner;
+    private final Scanner scanner;
 
     public MenuConsola() {
         this.scanner = new Scanner(System.in);
