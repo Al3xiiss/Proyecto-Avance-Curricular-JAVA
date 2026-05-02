@@ -1,6 +1,10 @@
 package avanceCurricular;
 import java.util.*;
 
+/**
+ * Representa a un estudiante dentro del sistema de avance curricular.
+ * Contiene su información personal, académica y el registro de su malla curricular.
+ */
 public class Alumno {
 
     // Atributos 
@@ -9,6 +13,15 @@ public class Alumno {
     private String carrera;
     private final List<Asignatura> malla;
 
+    /**
+     * Crea una nueva instancia de un alumno con sus datos básicos.
+     * Inicializa la malla curricular como una lista vacía para evitar errores de nulidad.
+     * 
+     * @param id Identificador único del alumno (ej. "A001").
+     * @param nombre Nombre completo del alumno.
+     * @param carrera Carrera que cursa el alumno.
+     */
+    
     // Constructor
     public Alumno(String id, String nombre, String carrera) {
         this.id = id;
@@ -19,34 +32,69 @@ public class Alumno {
 
 
     // GETTERS Y SETTERS (SIA-3 )
+    /**
+     * Obtiene el identificador del alumno.
+     * @return El ID del alumno.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Modifica el identificador del alumno.
+     * @param id El nuevo ID a asignar.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Obtiene el nombre del alumno.
+     * @return El nombre completo.
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Modifica el nombre del alumno.
+     * @param nombre El nuevo nombre a asignar.
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Obtiene la carrera que estudia el alumno.
+     * @return El nombre de la carrera.
+     */
     public String getCarrera() {
         return carrera;
     }
 
+    /**
+     * Modifica la carrera del alumno.
+     * @param carrera La nueva carrera a asignar.
+     */
     public void setCarrera(String carrera) {
         this.carrera = carrera;
     }
 
+    /**
+     * Obtiene una copia defensiva de la malla curricular del alumno.
+     * Se retorna una nueva lista para proteger el encapsulamiento de los datos originales.
+     * 
+     * @return Una lista con las asignaturas del alumno.
+     */
     public List<Asignatura> getMalla() {
         return new ArrayList<>(this.malla);
     }
 
+    /**
+     * Reemplaza la malla curricular completa del alumno por una nueva.
+     * 
+     * @param malla La nueva lista de asignaturas a asignar. Si es nula, no se realizan cambios.
+     */
     public void setMalla(List<Asignatura> malla) {
         if (malla != null) {
             this.malla.clear();
@@ -57,6 +105,12 @@ public class Alumno {
     // MÉTODOS FUNCIONALES
 
     // Agregar asignatura (Actualizado para SIA-7)
+    /**
+     * Agrega una asignatura existente a la malla curricular del alumno.
+     * 
+     * @param asig El objeto Asignatura a agregar.
+     * @throws AtributoInvalidoException Si la asignatura es nula o si ya existe una con el mismo código en la malla.
+     */
     public void agregarAsignatura(Asignatura asig) throws AtributoInvalidoException {
         try {
             if (asig == null) throw new AtributoInvalidoException("Asignatura nula.");
@@ -69,6 +123,15 @@ public class Alumno {
 
     // Crear y agregar asignatura directamente
     // SOBRECARGA (SIA-5 y SIA-12)
+    /**
+     * Sobrecarga del método para crear y agregar una Asignatura Obligatoria de forma directa a la malla.
+     * Por defecto, se asigna al semestre 1.
+     * 
+     * @param nombre Nombre de la asignatura.
+     * @param codigo Código identificador de la asignatura.
+     * @param creditos Cantidad de créditos que aporta la asignatura.
+     * @throws AtributoInvalidoException Si ocurre un error de validación o el código ya existe en la malla.
+     */
     public void agregarAsignatura(String nombre, String codigo, int creditos) throws AtributoInvalidoException {
         try {
             // Se crea la instancia y se intenta agregar
@@ -85,6 +148,12 @@ public class Alumno {
     }
 
     // Método auxiliar para buscar duplicados
+    /**
+     * Verifica si el alumno tiene registrada una asignatura específica en su malla.
+     * 
+     * @param codigo El código de la asignatura a verificar.
+     * @return true si la asignatura está inscrita, false en caso contrario o si el código es nulo.
+     */
     public boolean tieneAsignatura(String codigo) {
         if (codigo == null) return false;
         for (Asignatura a : malla) {
@@ -96,6 +165,13 @@ public class Alumno {
     } 
     
     // Busca una asignatura por su código en la malla
+    /**
+     * Busca y retorna una asignatura dentro de la malla del alumno mediante su código.
+     * 
+     * @param codigo El código exacto de la asignatura a buscar.
+     * @return La instancia de la Asignatura encontrada.
+     * @throws EntidadNoEncontradaException Si no existe ninguna asignatura con ese código en la malla.
+     */
     public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
         try {
             for (Asignatura a : malla) {
@@ -106,6 +182,12 @@ public class Alumno {
     }
 
     // Elimina una asignatura por su código
+    /**
+     * Elimina una asignatura de la malla curricular del alumno basándose en su código.
+     * 
+     * @param codigo El código de la asignatura a eliminar.
+     * @throws EntidadNoEncontradaException Si la asignatura no se encuentra en la malla.
+     */
     public void eliminarAsignatura(String codigo) throws EntidadNoEncontradaException {
         // SIA-12: Bloque try-catch explícito en la entidad
         try {
@@ -120,6 +202,12 @@ public class Alumno {
     }
     
     //  Calcular progreso curricular (SIA-9)
+    /**
+     * Calcula el porcentaje de avance curricular del alumno de acuerdo a sus asignaturas aprobadas.
+     * El cálculo se basa en el peso de los créditos de cada materia.
+     * 
+     * @return El porcentaje de progreso (de 0.0 a 100.0). Retorna 0.0 si la malla no tiene asignaturas inscritas.
+     */
     public double calcularProgreso() {
         int totalCreditos = 0;
         int creditosAprobados = 0;
@@ -140,6 +228,11 @@ public class Alumno {
     }
 
     //  Funcionalidad útil extra 
+    /**
+     * Obtiene una lista con las asignaturas de la malla que se encuentran en estado Pendiente (no aprobadas).
+     * 
+     * @return Una lista de asignaturas no aprobadas.
+     */
     public List<Asignatura> obtenerAsignaturasPendientes() {
         List<Asignatura> pendientes = new ArrayList<>();
 
@@ -152,6 +245,9 @@ public class Alumno {
     }
 
     //  Mostrar información del alumno
+    /**
+     * Imprime por consola la información general del alumno y un resumen estadístico de su progreso.
+     */
     public void mostrarInfo() {
         System.out.println("ID: " + id);
         System.out.println("Nombre: " + nombre);
