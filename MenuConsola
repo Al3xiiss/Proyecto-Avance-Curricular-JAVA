@@ -52,7 +52,8 @@ public class MenuConsola {
             System.out.println("6. Buscar alumno por nombre y carrera");
             System.out.println("7. Mostrar alumnos en riesgo");
             System.out.println("8. Gestionar asignaturas");
-            System.out.println("9. Volver");
+            System.out.println("9. Analizar Rendimiento por Carrera (KPI)");
+            System.out.println("10. Volver");
             System.out.print("Seleccione una opcion: ");
 
             opcion = leerEntero();
@@ -83,13 +84,16 @@ public class MenuConsola {
                     gestionarAsignaturasAlumno(registroAlumnos);
                     break;
                 case 9:
+                    analizarRendimientoCarrera(registroAlumnos);
+                    break;
+                case 10:
                     System.out.println("Volviendo al menu principal...");
                     break;
                 default:
                     System.out.println("Opcion invalida.");
             }
 
-        } while (opcion != 9);
+        } while (opcion != 10);
     }
 
     private void menuProfesores(RegistroProfesores registroProfesores) {
@@ -205,16 +209,22 @@ public class MenuConsola {
         String cod = leerTexto();
         System.out.print("Créditos: ");
         int cre = leerEntero();
-        if (tipo == 1) {
-            System.out.print("Semestre: ");
-            int sem = leerEntero();
-            profesor.getAsignaturas().add(new AsignaturaObligatoria(nom, cod, cre, sem));
-        } else {
-            System.out.print("Área: ");
-            String area = leerTexto();
-            profesor.getAsignaturas().add(new AsignaturaElectiva(nom, cod, cre, area));
+
+        try {
+            if (tipo == 1) {
+                System.out.print("Semestre: ");
+                int sem = leerEntero();
+                profesor.asignarAsignatura(new AsignaturaObligatoria(nom, cod, cre, sem));
+            } else {
+                System.out.print("Área: ");
+                String area = leerTexto();
+                profesor.asignarAsignatura(new AsignaturaElectiva(nom, cod, cre, area));
+            }
+            System.out.println("Asignatura vinculada al profesor correctamente.");
+            
+        } catch (AtributoInvalidoException e) {
+            System.out.println(e.getMessage());
         }
-        System.out.println("Asignatura vinculada al profesor.");
     }
 
     private void verAsignaturasProfesor(Profesor profesor) {
@@ -255,9 +265,9 @@ public class MenuConsola {
 
     private void buscarAsignaturaProfesor(Profesor profesor) {
         System.out.print("Ingrese código de la asignatura a buscar: ");
-        String codBus = leerTexto();
+        String codBuscar = leerTexto();
         try {
-            Asignatura asigBus = profesor.buscarAsignatura(codBus);
+            Asignatura asigBus = profesor.buscarAsignatura(codBuscar);
             asigBus.mostrarInfo();
         } catch (EntidadNoEncontradaException e) {
             System.out.println(e.getMessage());
@@ -315,7 +325,7 @@ public class MenuConsola {
     }
 
     private void agregarAsignaturaMalla(Alumno alumno) {
-        System.out.println("\nTipo de asignatura: 1. Obligatoria | 2. Electiva");
+        System.out.println("\nTipo de asignatura: 1. Obligatoria | 2. Electiva | 3. Obligatoria Rápida (Semestre 1)");
         int tipo = leerEntero();
         System.out.print("Nombre: ");
         String nom = leerTexto();
@@ -324,16 +334,33 @@ public class MenuConsola {
         System.out.print("Creditos: ");
         int cre = leerEntero();
 
-        if (tipo == 1) {
-            System.out.print("Semestre: ");
-            int sem = leerEntero();
-            alumno.getMalla().add(new AsignaturaObligatoria(nom, cod, cre, sem));
-        } else {
-            System.out.print("Area de interes: ");
-            String area = leerTexto();
-            alumno.getMalla().add(new AsignaturaElectiva(nom, cod, cre, area));
+        // AJUSTE 2: Eliminación de la variable booleana "exito" y uso de try-catch
+        try {
+            switch (tipo) {
+                case 1:
+                    System.out.print("Semestre: ");
+                    int sem = leerEntero();
+                    alumno.agregarAsignatura(new AsignaturaObligatoria(nom, cod, cre, sem));
+                    break;
+                case 2:
+                    System.out.print("Area de interes: ");
+                    String area = leerTexto();
+                    alumno.agregarAsignatura(new AsignaturaElectiva(nom, cod, cre, area));
+                    break;
+                case 3:
+                    alumno.agregarAsignatura(nom, cod, cre);
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+                    return;
+            }
+            // Si el bloque try finaliza sin errores, se imprime el éxito
+            System.out.println("Asignatura agregada con éxito a la malla.");
+            
+        } catch (AtributoInvalidoException e) {
+            // El mensaje de "Ya existe" o "Datos nulos" viene directamente de la lógica
+            System.out.println(e.getMessage());
         }
-        System.out.println("Asignatura agregada con éxito.");
     }
 
     private void mostrarMallaAlumno(Alumno alumno) {
@@ -392,10 +419,14 @@ public class MenuConsola {
         System.out.print("Ingrese carrera del alumno: ");
         String carrera = leerTexto();
 
-        if (registroAlumnos.agregarAlumno(id, nombre, carrera)) {
+        try {
+            // Se llama al método que ahora lanza AtributoInvalidoException
+            registroAlumnos.agregarAlumno(id, nombre, carrera);
             System.out.println("Alumno agregado correctamente.");
-        } else {
-            System.out.println("No se pudo agregar el alumno.");
+            
+        } catch (AtributoInvalidoException e) {
+            // SIA-12: El manejo de la excepción permite informar exactamente qué falló
+            System.out.println(e.getMessage());
         }
     }
 
@@ -403,7 +434,7 @@ public class MenuConsola {
         System.out.print("Ingrese ID del alumno a editar: ");
         String id = leerTexto();
         System.out.print("Ingrese nuevo nombre: ");
-        String nuevoNombre = leerTexto(); // Aunque leerTexto() evita vacíos por consola, es buena práctica que la clase lo valide de todas formas.
+        String nuevoNombre = leerTexto(); // Aunque leerTexto() evita vacíos por consola, por buena práctica lo valida de todas formas.
         System.out.print("Ingrese nueva carrera: ");
         String nuevaCarrera = leerTexto();
         try {
@@ -441,11 +472,13 @@ public class MenuConsola {
         String nombre = leerTexto();
         System.out.print("Ingrese carrera: ");
         String carrera = leerTexto();
-        Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
-        if (alumno != null) {
+        
+        try {
+            Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
             alumno.mostrarInfo();
-        } else {
-            System.out.println("Alumno no encontrado.");
+        } catch (EntidadNoEncontradaException e) {
+            // SIA-12: Atrapado correctamente
+            System.out.println(e.getMessage());
         }
     }
 
@@ -463,10 +496,14 @@ public class MenuConsola {
         System.out.print("Ingrese especialidad del profesor: ");
         String especialidad = leerTexto();
 
-        if (registroProfesores.agregarProfesor(id, nombre, especialidad)) {
+        try {
+            // Se llama al método que ahora lanza AtributoInvalidoException
+            registroProfesores.agregarProfesor(id, nombre, especialidad);
             System.out.println("Profesor agregado correctamente.");
-        } else {
-            System.out.println("No se pudo agregar el profesor.");
+            
+        } catch (AtributoInvalidoException e) {
+            // SIA-12: Captura el error (ID duplicado o campos vacíos) y muestra el mensaje descriptivo
+            System.out.println(e.getMessage());
         }
     }
 
@@ -526,9 +563,39 @@ public class MenuConsola {
     }
 
     private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
-        System.out.print("Ingrese especialidad: ");
+        System.out.print("Ingrese especialidad a buscar: ");
         String especialidad = leerTexto();
-        registroProfesores.mostrarProfesoresPorEspecialidad(especialidad);
+        
+        List<Profesor> lista = registroProfesores.obtenerProfesoresPorEspecialidad(especialidad);
+        
+        if (lista.isEmpty()) {
+            System.out.println("No se encontraron profesores con la especialidad: " + especialidad);
+        } else {
+            System.out.println("\n--- PROFESORES DE " + especialidad.toUpperCase() + " ---");
+            for (Profesor profesor : lista) {
+                profesor.mostrarInfo();
+            }
+        }
+    }
+    
+    private void analizarRendimientoCarrera(RegistroAlumnos registroAlumnos) {
+        System.out.print("Ingrese el nombre de la carrera a analizar (ej. Ingenieria en Sistemas): ");
+        String carrera = leerTexto();
+        
+        try {
+            double promedioGlobal = registroAlumnos.calcularRendimientoPromedioCarrera(carrera);
+
+            if (promedioGlobal == 0.0) {
+                System.out.println("No hay datos suficientes o no existen alumnos registrados en la carrera: " + carrera);
+            } else {
+                System.out.println("\n--- KPI DE RENDIMIENTO ACADEMICO ---");
+                System.out.println("Carrera analizada: " + carrera.toUpperCase());
+                System.out.println("Avance curricular promedio: " + String.format("%.2f", promedioGlobal) + "%");
+                System.out.println("------------------------------------");
+            }
+        } catch (AtributoInvalidoException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     // ==========================================================
