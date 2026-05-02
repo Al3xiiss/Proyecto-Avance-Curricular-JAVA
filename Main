@@ -1,8 +1,21 @@
 package avanceCurricular;
 import javax.swing.JOptionPane;
 
+/**
+ * Clase principal que actúa como punto de entrada de la aplicación "Sistema Académico - Avance Curricular".
+ * Se encarga de inicializar los registros en memoria, ejecutar la carga de datos persistentes (Batch), 
+ * gestionar la selección de la interfaz de usuario por parte del cliente y asegurar 
+ * el guardado de toda la información antes de finalizar la ejecución.
+ */
 public class Main {
 
+    /**
+     * Método principal que inicia la ejecución del programa.
+     * Gestiona el flujo de vida de la aplicación cumpliendo con el requerimiento de 
+     * persistencia al inicio y al final (SIA-11).
+     * 
+     * @param args Argumentos de línea de comandos (no se utilizan en esta implementación).
+     */
     public static void main(String[] args) {
         // 1. Instanciar los registros (bases de datos en memoria)
         RegistroAlumnos registroAlumnos = new RegistroAlumnos();
