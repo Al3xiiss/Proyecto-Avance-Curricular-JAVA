@@ -10,10 +10,6 @@ public class PersistenciaData {
     private static final String ASIG_ALUMNOS = "asignaturas_alumnos.txt";
     private static final String ASIG_PROFESORES = "asignaturas_profesores.txt";
 
-    // ==========================================================
-    // MÉTODOS DE CARGA (BATCH AL INICIAR)
-    // ==========================================================
-
     public static void cargarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
         cargarAlumnos(ra);
         cargarProfesores(rp);
@@ -24,94 +20,124 @@ public class PersistenciaData {
 
     private static void cargarAlumnos(RegistroAlumnos ra) {
         File file = new File(ARCHIVO_ALUMNOS);
-        if (!file.exists()) return;
+        
+        if (!file.exists()) {
+            try {
+                // SIA-3: Datos semilla manejados con try-catch (SIA-12)
+                ra.agregarAlumno("A001", "Juan Perez", "Ingenieria Informatica");
+                ra.agregarAlumno("A002", "Maria Lopez", "Ingenieria Civil");
+                ra.agregarAlumno("A003", "Carlos Santana", "Ingenieria Informatica");
+            } catch (AtributoInvalidoException e) {
+                System.err.println("Error en datos semilla de alumnos: " + e.getMessage());
+            }
+            return; 
+        }
+        
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String[] partes = sc.nextLine().split(";");
+                // Capturamos la excepción específica que lanza agregarAlumno
                 if (partes.length == 3) ra.agregarAlumno(partes[0], partes[1], partes[2]);
             }
-        } catch (Exception e) {
-            System.err.println("Error alumnos: " + e.getMessage());
+        } catch (IOException | AtributoInvalidoException e) { 
+            System.err.println("Error procesando alumnos: " + e.getMessage());
         }
     }
 
     private static void cargarProfesores(RegistroProfesores rp) {
         File file = new File(ARCHIVO_PROFESORES);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            try {
+                rp.agregarProfesor("P001", "Alan Turing", "Matematicas Computacionales");
+                rp.agregarProfesor("P002", "Ada Lovelace", "Algoritmos");
+            } catch (AtributoInvalidoException e) {
+                System.err.println("Error en datos semilla de profesores: " + e.getMessage());
+            }
+            return;
+        }
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String[] partes = sc.nextLine().split(";");
                 if (partes.length == 3) rp.agregarProfesor(partes[0], partes[1], partes[2]);
             }
-        } catch (Exception e) {
-            System.err.println("Error profesores: " + e.getMessage());
+        } catch (IOException | AtributoInvalidoException e) {
+            System.err.println("Error procesando profesores: " + e.getMessage());
         }
     }
 
     public static void cargarAsignaturasAlumnos(RegistroAlumnos ra) {
         File file = new File(ASIG_ALUMNOS);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            try {
+                Alumno a1 = ra.getAlumnos().get("A001");
+                if (a1 != null) {
+                    Asignatura asig1 = new AsignaturaObligatoria("Programacion Avanzada", "INF2241", 6, 3);
+                    asig1.setAprobada(true);
+                    a1.agregarAsignatura(asig1);
+                    a1.agregarAsignatura(new AsignaturaElectiva("Inteligencia Artificial", "INF300", 4, "Tecnologia"));
+                }
+            } catch (AtributoInvalidoException e) {
+                System.err.println("Error en mallas semilla: " + e.getMessage());
+            }
+            return;
+        }
+        
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String[] p = sc.nextLine().split(";");
                 if (p.length < 7) continue;
 
-                String idAlumno = p[0];
-                String tipo = p[1];
-                String nombre = p[2];
-                String codigo = p[3];
                 int creditos = Integer.parseInt(p[4]);
-                boolean aprobada = Boolean.parseBoolean(p[5]);
-
-                Asignatura asig = tipo.equals("OBL") 
-                    ? new AsignaturaObligatoria(nombre, codigo, creditos, Integer.parseInt(p[6]))
-                    : new AsignaturaElectiva(nombre, codigo, creditos, p[6]);
+                Asignatura asig = p[1].equals("OBL") 
+                    ? new AsignaturaObligatoria(p[2], p[3], creditos, Integer.parseInt(p[6]))
+                    : new AsignaturaElectiva(p[2], p[3], creditos, p[6]);
                 
-                asig.setAprobada(aprobada);
-                Alumno alumno = ra.getAlumnos().get(idAlumno);
+                asig.setAprobada(Boolean.parseBoolean(p[5]));
+                Alumno alumno = ra.getAlumnos().get(p[0]);
                 if (alumno != null) alumno.agregarAsignatura(asig);
             }
-        } catch (Exception e) {
-            System.err.println("Error asig alumnos: " + e.getMessage());
+        } catch (IOException | AtributoInvalidoException | NumberFormatException e) {
+            System.err.println("Error en asignaturas de alumnos: " + e.getMessage());
         }
     }
 
     public static void cargarAsignaturasProfesores(RegistroProfesores rp) {
         File file = new File(ASIG_PROFESORES);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            try {
+                Profesor p1 = rp.getProfesores().get("P001");
+                if (p1 != null) p1.asignarAsignatura(new AsignaturaObligatoria("Calculo I", "MAT101", 6, 1));
+            } catch (AtributoInvalidoException e) {
+                System.err.println("Error en carga académica semilla: " + e.getMessage());
+            }
+            return;
+        }
+        
         try (Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
                 String[] p = sc.nextLine().split(";");
                 if (p.length < 7) continue;
 
-                String idProf = p[0];
-                String tipo = p[1];
-                String nombre = p[2];
-                String codigo = p[3];
                 int creditos = Integer.parseInt(p[4]);
+                Asignatura asig = p[1].equals("OBL")
+                    ? new AsignaturaObligatoria(p[2], p[3], creditos, Integer.parseInt(p[6]))
+                    : new AsignaturaElectiva(p[2], p[3], creditos, p[6]);
 
-                Asignatura asig = tipo.equals("OBL")
-                    ? new AsignaturaObligatoria(nombre, codigo, creditos, Integer.parseInt(p[6]))
-                    : new AsignaturaElectiva(nombre, codigo, creditos, p[6]);
-
-                Profesor prof = rp.getProfesores().get(idProf);
-                if (prof != null) prof.getAsignaturas().add(asig);
+                Profesor prof = rp.getProfesores().get(p[0]);
+                if (prof != null) prof.asignarAsignatura(asig);
             }
-        } catch (Exception e) {
-            System.err.println("Error asig profesores: " + e.getMessage());
+        } catch (IOException | AtributoInvalidoException | NumberFormatException e) {
+            System.err.println("Error en asignaturas de profesores: " + e.getMessage());
         }
     }
 
-    // ==========================================================
-    // MÉTODOS DE GUARDADO (BATCH AL SALIR)
-    // ==========================================================
-
+    // Los métodos de guardado se mantienen igual ya que solo lanzan IOException (ya manejada)
     public static void guardarTodo(RegistroAlumnos ra, RegistroProfesores rp) {
         guardarAlumnos(ra);
         guardarProfesores(rp);
         guardarAsignaturasAlumnos(ra);
         guardarAsignaturasProfesores(rp);
-        System.out.println(" Todos los cambios han sido guardados en los archivos.");
+        System.out.println(" Todos los cambios han sido guardados.");
     }
 
     private static void guardarAlumnos(RegistroAlumnos ra) {
@@ -170,3 +196,4 @@ public class PersistenciaData {
             System.err.println("Error al guardar asignaturas profesores: " + e.getMessage());
         }
     }
+}
