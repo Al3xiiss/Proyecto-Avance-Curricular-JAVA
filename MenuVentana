@@ -59,13 +59,15 @@ public class MenuVentana {
                     + "6. Buscar alumno por nombre y carrera\n"
                     + "7. Mostrar alumnos en riesgo\n"
                     + "8. Gestionar asignaturas (Malla)\n"
-                    + "9. Volver\n"
+                    + "9. Analizar Rendimiento por Carrera (KPI)\n"
+                    + "10. Volver\n"
                     + "Seleccione una opción:"
             );
 
             if (entrada == null) {
                 return;
             }
+
             opcion = leerEntero(entrada);
 
             switch (opcion) {
@@ -94,11 +96,15 @@ public class MenuVentana {
                     gestionarAsignaturasAlumno(registroAlumnos);
                     break;
                 case 9:
+                    analizarRendimientoCarrera(registroAlumnos);
+                    break;
+                case 10:
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "Opcion invalida.");
             }
-        } while (opcion != 9);
+
+        } while (opcion != 10);
     }
 
     private void menuProfesores(RegistroProfesores registroProfesores) {
@@ -225,7 +231,7 @@ public class MenuVentana {
     }
 
     private void agregarAsignaturaMalla(Alumno alumno) {
-        String tipo = JOptionPane.showInputDialog("Tipo de asignatura:\n1. Obligatoria\n2. Electiva");
+        String tipo = JOptionPane.showInputDialog("Tipo de asignatura:\n1. Obligatoria\n2. Electiva\n3. Rapida (Obligatoria Semestre 1)");
         if (tipo == null) {
             return;
         }
@@ -240,20 +246,33 @@ public class MenuVentana {
             return;
         }
 
-        // Usamos el método auxiliar leerEntero para manejar errores de formato
         int cre = leerEntero(JOptionPane.showInputDialog("Creditos:"));
-        if (tipo.equals("1")) {
-            int sem = leerEntero(JOptionPane.showInputDialog("Semestre (1-10):"));
-            // Se agrega directamente a la lista del objeto alumno
-            alumno.getMalla().add(new AsignaturaObligatoria(nom, cod, cre, sem));
-        } else {
-            String area = JOptionPane.showInputDialog("Area de interes:");
-            if (area == null) {
-                return;
+
+        try {
+            switch (tipo) {
+                case "1":
+                    int sem = leerEntero(JOptionPane.showInputDialog("Semestre (1-10):"));
+                    alumno.agregarAsignatura(new AsignaturaObligatoria(nom, cod, cre, sem));
+                    break;
+                case "2":
+                    String area = JOptionPane.showInputDialog("Area de interes:");
+                    if (area == null) {
+                        return;
+                    }
+                    alumno.agregarAsignatura(new AsignaturaElectiva(nom, cod, cre, area));
+                    break;
+                case "3":
+                    alumno.agregarAsignatura(nom, cod, cre);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opción inválida.");
+                    return;
             }
-            alumno.getMalla().add(new AsignaturaElectiva(nom, cod, cre, area));
+            JOptionPane.showMessageDialog(null, "Asignatura agregada con exito a la malla de " + alumno.getNombre());
+
+        } catch (AtributoInvalidoException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error al agregar", JOptionPane.WARNING_MESSAGE);
         }
-        JOptionPane.showMessageDialog(null, "Asignatura agregada con exito a la malla de " + alumno.getNombre());
     }
 
     private void buscarAsignaturaMalla(Alumno alumno) {
@@ -267,7 +286,7 @@ public class MenuVentana {
             Asignatura b = alumno.buscarAsignatura(cod);
 
             String info = "Detalles de Asignatura:\n"
-                    + "• Nombre: " + b.getNombre() + "\n"
+                    + "• Nomb   re: " + b.getNombre() + "\n"
                     + "• Créditos: " + b.getCreditos() + "\n"
                     + "• Estado: " + (b.isAprobada() ? "Aprobada" : "Pendiente");
 
@@ -421,7 +440,7 @@ public class MenuVentana {
                     .append(" (").append(asig.getCreditos()).append(" créditos)\n");
         }
 
-        // Usamos un JTextArea dentro del Scroll por si la lista es muy extensa
+        // Usamos un JTextArea dentro del Scroll por si la lista es muy larga
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -506,25 +525,12 @@ public class MenuVentana {
     // MÉTODOS EXISTENTES 
     // ==========================================================
     private void agregarAlumno(RegistroAlumnos registroAlumnos) {
-        // 1. Pedir primero el ID
+        // 1. Pedimos los datos y validamos 
         String id = JOptionPane.showInputDialog("Ingrese ID del alumno:");
-
-        // Si el usuario presiona "Cancelar" o cierra la ventana
         if (id == null) {
             return;
         }
 
-        // 2. VERIFICACIÓN INMEDIATA:
-        // Buscamos si el ID ya está registrado en el Mapa de alumnos
-        if (registroAlumnos.getAlumnos().containsKey(id)) {
-            JOptionPane.showMessageDialog(null,
-                    "Error: Ya existe un alumno con el ID " + id + ".\nVolviendo al menú...",
-                    "ID Duplicado",
-                    JOptionPane.ERROR_MESSAGE);
-            return; // Corta la ejecución del método y vuelve al menú
-        }
-
-        // 3. Si el ID no existe, pedimos el resto de los datos
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del alumno:");
         if (nombre == null) {
             return;
@@ -535,13 +541,20 @@ public class MenuVentana {
             return;
         }
 
-        // 4. Agregamos al alumno (usando la sobrecarga que ya tienes)
-        boolean agregado = registroAlumnos.agregarAlumno(id, nombre, carrera);
+        // 2. Intentar la operación usando el sistema de excepciones (SIA-12)
+        try {
+            // Llamamos al método que ahora lanza AtributoInvalidoException
+            registroAlumnos.agregarAlumno(id, nombre, carrera);
 
-        if (agregado) {
+            // Si el flujo continúa aquí, la inserción fue exitosa
             JOptionPane.showMessageDialog(null, "Alumno agregado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(null, "No se pudo agregar el alumno.");
+
+        } catch (AtributoInvalidoException e) {
+            // SIA-12: Atrapamos el error y mostramos el mensaje que viene desde la lógica
+            JOptionPane.showMessageDialog(null,
+                    e.getMessage(),
+                    "Error de Registro",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -606,12 +619,20 @@ public class MenuVentana {
 
     private void buscarAlumnoPorNombreYCarrera(RegistroAlumnos registroAlumnos) {
         String n = JOptionPane.showInputDialog("Nombre:");
+        if (n == null) {
+            return;
+        }
         String c = JOptionPane.showInputDialog("Carrera:");
-        Alumno a = registroAlumnos.buscarAlumno(n, c);
-        if (a != null) {
-            JOptionPane.showMessageDialog(null, formatearAlumno(a));
-        } else {
-            JOptionPane.showMessageDialog(null, "No encontrado.");
+        if (c == null) {
+            return;
+        }
+
+        try {
+            Alumno a = registroAlumnos.buscarAlumno(n, c);
+            JOptionPane.showMessageDialog(null, formatearAlumno(a), "Resultado de Búsqueda", JOptionPane.INFORMATION_MESSAGE);
+        } catch (EntidadNoEncontradaException e) {
+            // SIA-12: Atrapado correctamente
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -630,22 +651,12 @@ public class MenuVentana {
     }
 
     private void agregarProfesor(RegistroProfesores registroProfesores) {
-        // 1. Pedir primero el ID
+        // 1. Pedimos los datos 
         String id = JOptionPane.showInputDialog("Ingrese ID del profesor:");
         if (id == null) {
             return;
         }
 
-        // 2. VERIFICACIÓN INMEDIATA
-        if (registroProfesores.getProfesores().containsKey(id)) {
-            JOptionPane.showMessageDialog(null,
-                    "Error: Ya existe un profesor con el ID " + id + ".\nVolviendo al menú...",
-                    "ID Duplicado",
-                    JOptionPane.ERROR_MESSAGE);
-            return; // Corta la ejecución y vuelve al menú
-        }
-
-        // 3. Si no existe, pedimos el resto de los datos
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del profesor:");
         if (nombre == null) {
             return;
@@ -656,13 +667,21 @@ public class MenuVentana {
             return;
         }
 
-        // 4. Intentar agregar
-        boolean agregado = registroProfesores.agregarProfesor(id, nombre, especialidad);
+        // 2. Intentar la operación dentro de un bloque try-catch (SIA-12)
+        try {
+            // Llamamos al método que es void y lanza AtributoInvalidoException
+            registroProfesores.agregarProfesor(id, nombre, especialidad);
 
-        if (agregado) {
+            // Si el código llega a esta línea, significa que no hubo errores
             JOptionPane.showMessageDialog(null, "Profesor registrado exitosamente.");
-        } else {
-            JOptionPane.showMessageDialog(null, "Error: No se pudo registrar al profesor.");
+
+        } catch (AtributoInvalidoException e) {
+            // SIA-12: El manejo de la excepción se hace aquí.
+            // Mostramos el mensaje específico que viene desde la lógica (ID duplicado, campos vacíos, etc.)
+            JOptionPane.showMessageDialog(null,
+                    e.getMessage(),
+                    "Error al registrar",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -749,13 +768,46 @@ public class MenuVentana {
 
     private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
         String esp = JOptionPane.showInputDialog("Especialidad:");
+        if (esp == null || esp.trim().isEmpty()) {
+            return;
+        }
+
+        List<Profesor> lista = registroProfesores.obtenerProfesoresPorEspecialidad(esp);
+
+        if (lista.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No se encontraron profesores con la especialidad: " + esp, "Información", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String texto = "Profesores de " + esp + ":\n";
-        for (Profesor p : registroProfesores.getProfesores().values()) {
-            if (p.getEspecialidad().equalsIgnoreCase(esp)) {
-                texto += "- " + p.getNombre() + "\n";
-            }
+        for (Profesor p : lista) {
+            texto += "- " + p.getNombre() + "\n";
         }
         mostrarMensaje("ESPECIALIDAD", texto);
+    }
+
+    private void analizarRendimientoCarrera(RegistroAlumnos registroAlumnos) {
+        String carrera = JOptionPane.showInputDialog(null, "Ingrese el nombre de la carrera a analizar (ej. Ingenieria en Sistemas):", JOptionPane.QUESTION_MESSAGE);
+        
+        if (carrera == null || carrera.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            double promedioGlobal = registroAlumnos.calcularRendimientoPromedioCarrera(carrera);
+
+            if (promedioGlobal == 0.0) {
+                JOptionPane.showMessageDialog(null, "No hay datos suficientes o no existen alumnos registrados en la carrera: " + carrera, "Resultado de Análisis", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                String reporte = "KPI DE RENDIMIENTO ACADÉMICO\n"
+                               + "Carrera analizada: " + carrera.toUpperCase() + "\n"
+                               + "Avance curricular promedio: " + String.format("%.2f", promedioGlobal) + "%";
+                
+                JOptionPane.showMessageDialog(null, reporte, "Inteligencia de Negocios", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (AtributoInvalidoException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error en el Análisis", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // ==========================================================
@@ -770,7 +822,7 @@ public class MenuVentana {
     }
 
     private void mostrarMensaje(String titulo, String contenido) {
-        // 1. Creamos un área de texto donde irá el listado de datos
+        // 1. Creamos un área de texto donde irá el listado
         JTextArea textArea = new JTextArea(20, 50); // 20 filas de alto
         textArea.setText(contenido);
         textArea.setEditable(false); // Para que no puedan editar el listado
