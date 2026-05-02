@@ -12,7 +12,7 @@ public class RegistroProfesores {
         this.profesores = new HashMap<>();
     }
 
-    // GETTER
+    // GETTER Y SETTER
     public Map<String, Profesor> getProfesores() {
         return new HashMap<>(this.profesores);
     }
@@ -25,73 +25,112 @@ public class RegistroProfesores {
     }
 
     // INSERCIÓN
-    public boolean agregarProfesor(Profesor profesor) {
-        if (profesor == null) {
-            return false;
-        }
+    public void agregarProfesor(Profesor profesor) throws AtributoInvalidoException {
+        try {
+            if (profesor == null) {
+                throw new AtributoInvalidoException("Error: No se puede agregar un profesor nulo.");
+            }
 
-        if (profesor.getId() == null || profesor.getId().trim().isEmpty()) {
-            return false;
-        }
+            if (profesor.getId() == null || profesor.getId().trim().isEmpty()) {
+                throw new AtributoInvalidoException("Error: El ID del profesor no puede estar vacío.");
+            }
 
-        if (profesores.containsKey(profesor.getId())) {
-            return false;
-        }
+            if (profesores.containsKey(profesor.getId())) {
+                throw new AtributoInvalidoException("Error: Ya existe un profesor con el ID " + profesor.getId() + ".");
+            }
 
-        profesores.put(profesor.getId(), profesor);
-        return true;
+            // Si las validaciones pasan, se añade al HashMap
+            profesores.put(profesor.getId(), profesor);
+
+        } catch (AtributoInvalidoException e) {
+            // Se atrapa y se relanza para que el Menú  lo maneje finalmente
+            throw e;
+        }
     }
 
     // SOBRECARGA (SIA-5)
-    public boolean agregarProfesor(String id, String nombre, String especialidad) {
-        Profesor profesor = new Profesor(id, nombre, especialidad);
-        return agregarProfesor(profesor);
+    public void agregarProfesor(String id, String nombre, String especialidad) throws AtributoInvalidoException {
+        try {
+            if (id == null || id.trim().isEmpty()) {
+                throw new AtributoInvalidoException("Error: El ID del profesor no puede estar vacío.");
+            }
+
+            if (profesores.containsKey(id)) {
+                throw new AtributoInvalidoException("Error: Ya existe un profesor con el ID " + id + ".");
+            }
+
+            profesores.put(id, new Profesor(id, nombre, especialidad));
+            
+        } catch (AtributoInvalidoException e) {
+            throw e;
+        }
     }
 
     // BÚSQUEDA
     public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
-        Profesor p = profesores.get(id);
-        if (p == null) {
-            throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
+        try {
+            Profesor p = profesores.get(id);
+            if (p == null) {
+                // Lanzamos la excepción si el objeto es null
+                throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
+            }
+            return p;
+        } catch (EntidadNoEncontradaException e) {
+            // Se atrapa y se relanza para cumplir con el uso de try-catch en la lógica
+            throw e;
         }
-        return p;
     }
 
     // SOBRECARGA (SIA-5)
     public Profesor buscarProfesorPorNombre(String nombre) throws EntidadNoEncontradaException {
-        Collection<Profesor> lista = profesores.values();
-        for (Profesor profesor : lista) {
-            if (profesor.getNombre().equalsIgnoreCase(nombre)) {
-                return profesor;
+        try {
+            Collection<Profesor> lista = profesores.values();
+            for (Profesor profesor : lista) {
+                if (profesor.getNombre().equalsIgnoreCase(nombre)) {
+                    return profesor;
+                }
             }
+            // Si termina el ciclo sin encontrar nada, lanzamos la excepción
+            throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
+            
+        } catch (EntidadNoEncontradaException e) {
+            // Relanzamos la excepción hacia la capa superior
+            throw e;
         }
-        throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
     }
 
     // EDICIÓN    
     public void editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) throws EntidadNoEncontradaException, AtributoInvalidoException {
-        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
-            throw new AtributoInvalidoException("Error: El nombre del profesor no puede estar vacío.");
-        }
-        if (nuevaEspecialidad == null || nuevaEspecialidad.trim().isEmpty()) {
-            throw new AtributoInvalidoException("Error: La especialidad no puede estar vacía.");
-        }
+        try {
+            if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+                throw new AtributoInvalidoException("Error: El nombre del profesor no puede estar vacío.");
+            }
+            if (nuevaEspecialidad == null || nuevaEspecialidad.trim().isEmpty()) {
+                throw new AtributoInvalidoException("Error: La especialidad no puede estar vacía.");
+            }
 
-        Profesor profesor = buscarProfesor(id);
-        if (profesor == null) {
-            throw new EntidadNoEncontradaException("Error: No se encontró un profesor con el ID indicado para editar.");
+            Profesor profesor = buscarProfesor(id);
+            profesor.setNombre(nuevoNombre);
+            profesor.setEspecialidad(nuevaEspecialidad);
+            
+        } catch (EntidadNoEncontradaException | AtributoInvalidoException e) {
+            // Relanzamos para que llegue al menú (SIA-12)
+            throw e;
         }
-
-        profesor.setNombre(nuevoNombre);
-        profesor.setEspecialidad(nuevaEspecialidad);
     }
 
     // ELIMINACIÓN
     public void eliminarProfesor(String id) throws EntidadNoEncontradaException {
-        if (!profesores.containsKey(id)) {
-            throw new EntidadNoEncontradaException("Error: No se puede eliminar. Profesor no encontrado.");
+        try {
+            if (!profesores.containsKey(id)) {
+                throw new EntidadNoEncontradaException("Error: No se puede eliminar. Profesor no encontrado.");
+            }
+            profesores.remove(id);
+            
+        } catch (EntidadNoEncontradaException e) {
+            // Atrapamos y relanzamos para que el error viaje hacia el menú
+            throw e;
         }
-        profesores.remove(id);
     }
 
     // LISTADO
@@ -106,20 +145,17 @@ public class RegistroProfesores {
         }
     }
 
-    // FUNCIONALIDAD DE NEGOCIO (SIA-9)
-    public void mostrarProfesoresPorEspecialidad(String especialidad) {
-        boolean encontrado = false;
-
+    // FUNCIONALIDAD DE NEGOCIO 
+    public List<Profesor> obtenerProfesoresPorEspecialidad(String especialidad) {
+        List<Profesor> filtrados = new ArrayList<>();
+        
         for (Profesor profesor : profesores.values()) {
             if (profesor.getEspecialidad().equalsIgnoreCase(especialidad)) {
-                profesor.mostrarInfo();
-                encontrado = true;
+                filtrados.add(profesor);
             }
         }
-
-        if (encontrado == false) {
-            System.out.println("No se encontraron profesores con esa especialidad.");
-        }
+        
+        return filtrados;
     }
 
     // UTILIDADES
