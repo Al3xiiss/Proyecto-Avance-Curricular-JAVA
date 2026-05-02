@@ -2,37 +2,29 @@ package avanceCurricular;
 
 import java.util.*;
 
-
 public class RegistroAlumnos {
 
-
     // ATRIBUTO
-
-    private Map<String, Alumno> alumnos;
-
+    private final Map<String, Alumno> alumnos;
 
     // CONSTRUCTOR
-
     public RegistroAlumnos() {
         this.alumnos = new HashMap<>();
     }
 
-
-    // GETTER Y SETTER
-
+    // GETTER
     public Map<String, Alumno> getAlumnos() {
-        return alumnos;
+        return new HashMap<>(this.alumnos);
     }
 
     public void setAlumnos(Map<String, Alumno> alumnos) {
-        this.alumnos = alumnos;
+        if (alumnos != null) {
+            this.alumnos.clear();
+            this.alumnos.putAll(alumnos);
+        }
     }
 
-
     // MÉTODOS DE INSERCIÓN
-
-
-    // Inserción normal
     public boolean agregarAlumno(Alumno alumno) {
         if (alumno == null) {
             return false;
@@ -56,10 +48,7 @@ public class RegistroAlumnos {
         return agregarAlumno(alumno);
     }
 
-
-    // BÚSQUEDA
-
-
+    // BÚSQUED
     public Alumno buscarAlumno(String id) throws EntidadNoEncontradaException {
         if (!alumnos.containsKey(id)) {
             throw new EntidadNoEncontradaException("Error: El alumno con ID " + id + " no existe en el registro.");
@@ -72,21 +61,16 @@ public class RegistroAlumnos {
         Collection<Alumno> valores = alumnos.values();
 
         for (Alumno alumno : valores) {
-            if (alumno.getNombre().equalsIgnoreCase(nombre) &&
-                alumno.getCarrera().equalsIgnoreCase(carrera)) {
+            if (alumno.getNombre().equalsIgnoreCase(nombre)
+                    && alumno.getCarrera().equalsIgnoreCase(carrera)) {
                 return alumno;
             }
         }
-
         return null;
     }
 
-
     // EDICIÓN
-
-
-    // EDICIÓN
-    public void editarAlumno(String id, String nuevoNombre, String nuevaCarrera) throws EntidadNoEncontradaException, AtributoInvalidoException {      
+    public void editarAlumno(String id, String nuevoNombre, String nuevaCarrera) throws EntidadNoEncontradaException, AtributoInvalidoException {
         // Lanzamos la excepción si los atributos no son válidos
         if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
             throw new AtributoInvalidoException("Error: El nombre del alumno no puede estar vacío.");
@@ -95,13 +79,12 @@ public class RegistroAlumnos {
             throw new AtributoInvalidoException("Error: La carrera no puede estar vacía.");
         }
         // Al llamar a buscarAlumno, si no lo encuentra, lanzará la excepción EntidadNoEncontradaException
-        Alumno alumno = buscarAlumno(id); 
+        Alumno alumno = buscarAlumno(id);
         alumno.setNombre(nuevoNombre);
         alumno.setCarrera(nuevaCarrera);
     }
 
     // ELIMINACIÓN
-
     public void eliminarAlumno(String id) throws EntidadNoEncontradaException {
         if (!alumnos.containsKey(id)) {
             throw new EntidadNoEncontradaException("Error: No se puede eliminar. El ID " + id + " no existe.");
@@ -109,10 +92,7 @@ public class RegistroAlumnos {
         alumnos.remove(id);
     }
 
-
     // LISTADO
-
-
     public void mostrarAlumnos() {
         if (alumnos.isEmpty()) {
             System.out.println("No hay alumnos registrados.");
@@ -124,10 +104,7 @@ public class RegistroAlumnos {
         }
     }
 
-
     // FUNCIONALIDAD DE NEGOCIO
-
-
     public List<Alumno> obtenerAlumnosEnRiesgo(double porcentajeMinimo) {
         List<Alumno> enRiesgo = new ArrayList<>();
 
@@ -155,7 +132,6 @@ public class RegistroAlumnos {
     }
 
     // UTILIDAD
-
     public int getCantidadAlumnos() {
         return alumnos.size();
     }
