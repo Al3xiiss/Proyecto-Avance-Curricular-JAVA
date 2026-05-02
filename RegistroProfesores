@@ -2,21 +2,46 @@ package avanceCurricular;
 
 import java.util.*;
 
+/**
+ * Clase gestora encargada de administrar la colección de profesores del sistema.
+ * Utiliza un {@link Map} para el almacenamiento, permitiendo el acceso rápido a los 
+ * datos de los docentes a través de su identificador único[: 7].
+ */
 public class RegistroProfesores {
 
     // ATRIBUTO
+    /**
+     * Mapa interno que almacena los profesores, utilizando el ID como clave 
+     * y el objeto {@link Profesor} como valor[: 7].
+     */
     private final Map<String, Profesor> profesores;
 
     // CONSTRUCTOR
+    /**
+     * Inicializa un nuevo registro de profesores configurando el mapa interno 
+     * como un {@link HashMap} vacío[: 7].
+     */
     public RegistroProfesores() {
         this.profesores = new HashMap<>();
     }
 
     // GETTER Y SETTER
+    /**
+     * Retorna una copia defensiva del mapa de profesores.
+     * Se crea una nueva instancia del mapa para evitar la manipulación directa 
+     * de la colección interna desde el exterior[: 7].
+     * 
+     * @return Un nuevo {@link HashMap} con los registros actuales de profesores[: 7].
+     */
     public Map<String, Profesor> getProfesores() {
         return new HashMap<>(this.profesores);
     }
 
+    /**
+     * Reemplaza la colección completa de profesores por una nueva.
+     * 
+     * @param profesores El nuevo mapa de profesores a establecer. Si es nulo, no realiza cambios[: 7].
+     */
     public void setProfesores(Map<String, Profesor> profesores) {
         if (profesores != null) {
             this.profesores.clear();
@@ -25,6 +50,13 @@ public class RegistroProfesores {
     }
 
     // INSERCIÓN
+    /**
+     * Registra un objeto Profesor previamente instanciado en el sistema.
+     * Realiza validaciones de nulidad y verifica que el ID no esté duplicado en el mapa[: 7].
+     * 
+     * @param profesor El objeto {@link Profesor} que se desea agregar[: 7].
+     * @throws AtributoInvalidoException Si el profesor es nulo, el ID es inválido o ya se encuentra registrado[: 7].
+     */
     public void agregarProfesor(Profesor profesor) throws AtributoInvalidoException {
         try {
             if (profesor == null) {
@@ -39,16 +71,21 @@ public class RegistroProfesores {
                 throw new AtributoInvalidoException("Error: Ya existe un profesor con el ID " + profesor.getId() + ".");
             }
 
-            // Si las validaciones pasan, se añade al HashMap
             profesores.put(profesor.getId(), profesor);
 
         } catch (AtributoInvalidoException e) {
-            // Se atrapa y se relanza para que el Menú  lo maneje finalmente
             throw e;
         }
     }
 
-    // SOBRECARGA (SIA-5)
+    /**
+     * Sobrecarga del método de inserción que crea y registra un profesor a partir de sus atributos básicos (SIA-5).
+     * 
+     * @param id Identificador único para el nuevo profesor.
+     * @param nombre Nombre completo del docente.
+     * @param especialidad Área de especialización académica.
+     * @throws AtributoInvalidoException Si los datos proporcionados no cumplen con las reglas de validación[: 7].
+     */
     public void agregarProfesor(String id, String nombre, String especialidad) throws AtributoInvalidoException {
         try {
             if (id == null || id.trim().isEmpty()) {
@@ -67,21 +104,33 @@ public class RegistroProfesores {
     }
 
     // BÚSQUEDA
+    /**
+     * Localiza a un profesor en el registro utilizando su ID.
+     * 
+     * @param id Identificador del profesor a buscar.
+     * @return El objeto {@link Profesor} encontrado[: 7].
+     * @throws EntidadNoEncontradaException Si no existe ningún profesor asociado a ese ID[: 7].
+     */
     public Profesor buscarProfesor(String id) throws EntidadNoEncontradaException {
         try {
             Profesor p = profesores.get(id);
             if (p == null) {
-                // Lanzamos la excepción si el objeto es null
                 throw new EntidadNoEncontradaException("El profesor con ID " + id + " no existe.");
             }
             return p;
         } catch (EntidadNoEncontradaException e) {
-            // Se atrapa y se relanza para cumplir con el uso de try-catch en la lógica
             throw e;
         }
     }
 
-    // SOBRECARGA (SIA-5)
+    /**
+     * Sobrecarga del método de búsqueda que localiza a un profesor por su nombre (SIA-5).
+     * Realiza una iteración sobre la colección para encontrar la primera coincidencia exacta[: 7].
+     * 
+     * @param nombre Nombre completo del profesor a buscar (no sensible a mayúsculas/minúsculas).
+     * @return La instancia del profesor encontrado[: 7].
+     * @throws EntidadNoEncontradaException Si no se encuentra ningún docente con ese nombre[: 7].
+     */
     public Profesor buscarProfesorPorNombre(String nombre) throws EntidadNoEncontradaException {
         try {
             Collection<Profesor> lista = profesores.values();
@@ -90,16 +139,23 @@ public class RegistroProfesores {
                     return profesor;
                 }
             }
-            // Si termina el ciclo sin encontrar nada, lanzamos la excepción
             throw new EntidadNoEncontradaException("Error: No se encontro un profesor con el nombre: " + nombre);
             
         } catch (EntidadNoEncontradaException e) {
-            // Relanzamos la excepción hacia la capa superior
             throw e;
         }
     }
 
     // EDICIÓN    
+    /**
+     * Actualiza la información personal de un docente tras validar que los nuevos datos sean correctos.
+     * 
+     * @param id ID del profesor que se desea editar.
+     * @param nuevoNombre Nuevo nombre para el docente.
+     * @param nuevaEspecialidad Nueva especialidad académica.
+     * @throws EntidadNoEncontradaException Si el profesor no existe en el registro.
+     * @throws AtributoInvalidoException Si los campos de actualización están vacíos o son nulos[: 7].
+     */
     public void editarProfesor(String id, String nuevoNombre, String nuevaEspecialidad) throws EntidadNoEncontradaException, AtributoInvalidoException {
         try {
             if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
@@ -114,12 +170,17 @@ public class RegistroProfesores {
             profesor.setEspecialidad(nuevaEspecialidad);
             
         } catch (EntidadNoEncontradaException | AtributoInvalidoException e) {
-            // Relanzamos para que llegue al menú (SIA-12)
             throw e;
         }
     }
 
     // ELIMINACIÓN
+    /**
+     * Remueve a un profesor del registro basándose en su identificador único.
+     * 
+     * @param id ID del profesor a eliminar.
+     * @throws EntidadNoEncontradaException Si el identificador no existe en la colección[: 7].
+     */
     public void eliminarProfesor(String id) throws EntidadNoEncontradaException {
         try {
             if (!profesores.containsKey(id)) {
@@ -128,12 +189,14 @@ public class RegistroProfesores {
             profesores.remove(id);
             
         } catch (EntidadNoEncontradaException e) {
-            // Atrapamos y relanzamos para que el error viaje hacia el menú
             throw e;
         }
     }
 
     // LISTADO
+    /**
+     * Imprime por consola la información básica de todos los profesores registrados actualmente[: 7].
+     */
     public void mostrarProfesores() {
         if (profesores.isEmpty()) {
             System.out.println("No hay profesores registrados.");
@@ -146,6 +209,12 @@ public class RegistroProfesores {
     }
 
     // FUNCIONALIDAD DE NEGOCIO 
+    /**
+     * Filtra la colección de profesores para obtener un subconjunto basado en una especialidad (SIA-9).
+     * 
+     * @param especialidad El área académica por la cual filtrar.
+     * @return Una {@link List} con los profesores que pertenecen a dicha especialidad[: 7].
+     */
     public List<Profesor> obtenerProfesoresPorEspecialidad(String especialidad) {
         List<Profesor> filtrados = new ArrayList<>();
         
@@ -159,10 +228,20 @@ public class RegistroProfesores {
     }
 
     // UTILIDADES
+    /**
+     * Obtiene la cantidad total de profesores inscritos en el sistema[: 7].
+     * @return El número de registros en el mapa.
+     */
     public int getCantidadProfesores() {
         return profesores.size();
     }
 
+    /**
+     * Comprueba si un profesor existe en el registro mediante su identificador.
+     * 
+     * @param id El ID a verificar.
+     * @return true si el profesor está registrado, false en caso contrario o si el ID es nulo[: 7].
+     */
     public boolean existeProfesor(String id) {
         if (id == null) {
             return false;
