@@ -1,6 +1,18 @@
 package avanceCurricular;
 
+/**
+ * Excepción personalizada utilizada para manejar fallos en las operaciones de búsqueda.
+ * Se lanza cuando el sistema intenta buscar, editar o eliminar un registro (Alumno, Profesor 
+ * o Asignatura) que no existe en las colecciones actuales.
+ */
 public class EntidadNoEncontradaException extends Exception {
+    
+    /**
+     * Construye una nueva excepción de entidad no encontrada con el mensaje de detalle especificado.
+     * 
+     * @param mensaje El mensaje que describe qué entidad no se pudo encontrar 
+     *                (ej. "El alumno con ID A001 no existe").
+     */
     public EntidadNoEncontradaException(String mensaje) {
         super(mensaje);
     }
