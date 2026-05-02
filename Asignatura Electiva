@@ -1,25 +1,53 @@
 package avanceCurricular;
 
+/**
+ * Representa una asignatura de carácter electivo u optativo dentro de la malla curricular.
+ * Hereda los atributos básicos de la clase abstracta {@link Asignatura} y añade
+ * una propiedad específica para categorizar el área de interés de la materia.
+ */
 public class AsignaturaElectiva extends Asignatura {
 
     private String area;
 
+    /**
+     * Construye una nueva asignatura electiva con sus datos básicos y su área específica.
+     * Invoca al constructor de la superclase para inicializar el nombre, código y créditos.
+     * 
+     * @param nombre El nombre de la asignatura electiva.
+     * @param codigo El código único de la materia.
+     * @param creditos Los créditos académicos que aporta.
+     * @param area El área de conocimiento o interés a la que pertenece (ej. "Tecnología", "Humanidades").
+     */
     public AsignaturaElectiva(String nombre, String codigo, int creditos, String area) {
         super(nombre, codigo, creditos);
         this.area = area;
     }
 
+    /**
+     * Obtiene el área de conocimiento de la asignatura electiva.
+     * 
+     * @return El nombre del área a la que pertenece la materia.
+     */
     public String getArea() {
         return area;
     }
 
+    /**
+     * Modifica el área de conocimiento de la asignatura electiva.
+     * 
+     * @param area La nueva área a asignar.
+     */
     public void setArea(String area) {
         this.area = area;
     }
 
+    /**
+     * Imprime por consola los detalles específicos de la asignatura electiva.
+     * Sobreescribe el método abstracto de la clase padre para incluir el "Tipo" y el "Área" 
+     * en la salida visual.
+     */
     @Override
     public void mostrarInfo() {
-
         String estado;
 
         if (this.isAprobada() == true) {
