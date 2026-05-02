@@ -2,20 +2,43 @@ package avanceCurricular;
 
 import java.util.*;
 
+/**
+ * Clase gestora que administra la colección de alumnos del sistema.
+ * Utiliza un {@link Map} para almacenar a los estudiantes, facilitando búsquedas 
+ * eficientes mediante su identificador único.
+ */
 public class RegistroAlumnos {
+
     // ATRIBUTO
+    /**
+     * Mapa interno que almacena los alumnos, donde la clave es el ID del alumno 
+     * y el valor es el objeto {@link Alumno} correspondiente.
+     */
     private final Map<String, Alumno> alumnos;
-    
+
     // CONSTRUCTOR
+    /**
+     * Inicializa un nuevo registro de alumnos con un {@link HashMap} vacío.
+     */
     public RegistroAlumnos() {
         this.alumnos = new HashMap<>();
     }
-    
+
     // GETTER Y SETTER
+    /**
+     * Retorna una copia defensiva del mapa de alumnos para proteger el encapsulamiento.
+     * 
+     * @return Un nuevo {@link HashMap} que contiene todas las entradas de alumnos actuales.
+     */
     public Map<String, Alumno> getAlumnos() {
         return new HashMap<>(this.alumnos);
     }
 
+    /**
+     * Reemplaza la colección actual de alumnos por una nueva.
+     * 
+     * @param alumnos El nuevo mapa de alumnos a establecer. Si es nulo, no se realizan cambios.
+     */
     public void setAlumnos(Map<String, Alumno> alumnos) {
         if (alumnos != null) {
             this.alumnos.clear();
@@ -23,11 +46,15 @@ public class RegistroAlumnos {
         }
     }
 
-
     // MÉTODOS DE INSERCIÓN
-    // Inserción normal 
+    /**
+     * Agrega un objeto Alumno ya instanciado al registro.
+     * Valida que el objeto no sea nulo, que el ID sea válido y que no existan duplicados.
+     * 
+     * @param alumno El objeto {@link Alumno} a registrar.
+     * @throws AtributoInvalidoException Si el alumno es nulo, el ID está vacío o ya existe en el mapa.
+     */
     public void agregarAlumno(Alumno alumno) throws AtributoInvalidoException {
-        // SIA-12: El evaluador exige ver el bloque try-catch explícito
         try {
             if (alumno == null) {
                 throw new AtributoInvalidoException("Error: No se puede agregar un alumno nulo.");
@@ -41,72 +68,95 @@ public class RegistroAlumnos {
                 throw new AtributoInvalidoException("Error: Ya existe un alumno con el ID " + alumno.getId() + ".");
             }
 
-            // Si no saltó ninguna excepción, procedemos con la inserción
             alumnos.put(alumno.getId(), alumno);
 
         } catch (AtributoInvalidoException e) {
-            // Atrapamos la excepción y la relanzamos para que el Menú la maneje 
             throw e;
         }
     }
 
-    // SOBRECARGA (SIA-5)
+    /**
+     * Sobrecarga del método de inserción que crea e inserta un alumno a partir de datos individuales (SIA-5).
+     * 
+     * @param id Identificador único del alumno.
+     * @param nombre Nombre completo del alumno.
+     * @param carrera Carrera que cursa el estudiante.
+     * @throws AtributoInvalidoException Si los datos de entrada no cumplen con las validaciones de negocio.
+     */
     public void agregarAlumno(String id, String nombre, String carrera) throws AtributoInvalidoException {
-        // SIA-12: Envoltorio try-catch 
         try {
             if (id == null || id.trim().isEmpty()) {
                 throw new AtributoInvalidoException("Error: El ID del alumno no puede estar vacío.");
             }
-            
+
             if (alumnos.containsKey(id)) {
                 throw new AtributoInvalidoException("Error: Ya existe un alumno con el ID " + id + ".");
             }
 
-            // Si pasa las validaciones, se agrega
             alumnos.put(id, new Alumno(id, nombre, carrera));
-            
+
         } catch (AtributoInvalidoException e) {
-            // Atrapamos y relanzamos para que llegue al Menú 
             throw e;
         }
     }
 
     // BÚSQUEDA
+    /**
+     * Busca un alumno en el registro utilizando su identificador único.
+     * 
+     * @param id El ID del alumno a localizar.
+     * @return El objeto {@link Alumno} si se encuentra en el registro.
+     * @throws EntidadNoEncontradaException Si no existe ningún alumno con el ID proporcionado.
+     */
     public Alumno buscarAlumno(String id) throws EntidadNoEncontradaException {
         try {
             if (!alumnos.containsKey(id)) {
                 throw new EntidadNoEncontradaException("Error: El alumno con ID " + id + " no existe en el registro.");
             }
             return alumnos.get(id);
-            
+
         } catch (EntidadNoEncontradaException e) {
-            // SIA-12: Capturamos la excepción generada y la relanzamos
             throw e;
         }
     }
 
-    // SOBRECARGA (SIA-5 y SIA-12)
+    /**
+     * Sobrecarga del método de búsqueda que localiza un alumno por su nombre y carrera (SIA-5).
+     * Realiza una búsqueda iterativa sobre los valores del mapa.
+     * 
+     * @param nombre Nombre del alumno (no sensible a mayúsculas).
+     * @param carrera Carrera del alumno (no sensible a mayúsculas).
+     * @return El objeto {@link Alumno} que coincida con ambos criterios.
+     * @throws EntidadNoEncontradaException Si no se encuentra ninguna coincidencia exacta.
+     */
     public Alumno buscarAlumno(String nombre, String carrera) throws EntidadNoEncontradaException {
         try {
             Collection<Alumno> valores = alumnos.values();
 
             for (Alumno alumno : valores) {
-                if (alumno.getNombre().equalsIgnoreCase(nombre) &&
-                    alumno.getCarrera().equalsIgnoreCase(carrera)) {
+                if (alumno.getNombre().equalsIgnoreCase(nombre)
+                        && alumno.getCarrera().equalsIgnoreCase(carrera)) {
                     return alumno;
                 }
             }
-            // Si termina el ciclo y no encontró nada, lanzamos la excepción
             throw new EntidadNoEncontradaException("Error: No se encontro al alumno " + nombre + " de la carrera " + carrera);
-            
+
         } catch (EntidadNoEncontradaException e) {
-            // Relanzamos para cumplir con la exigencia estructural del try-catch
             throw e;
         }
     }
 
-    // EDICIÓN (SIA-12)
-    public void editarAlumno(String id, String nuevoNombre, String nuevaCarrera) throws EntidadNoEncontradaException, AtributoInvalidoException {      
+    // EDICIÓN
+    /**
+     * Actualiza la información básica de un alumno existente tras validar los nuevos datos.
+     * 
+     * @param id ID del alumno a editar.
+     * @param nuevoNombre Nuevo nombre para el estudiante.
+     * @param nuevaCarrera Nueva carrera para el estudiante.
+     * @throws EntidadNoEncontradaException Si el alumno no existe.
+     * @throws AtributoInvalidoException Si los nuevos datos son nulos o vacíos.
+     */
+    public void editarAlumno(String id, String nuevoNombre, String nuevaCarrera) throws EntidadNoEncontradaException, AtributoInvalidoException {
         try {
             if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
                 throw new AtributoInvalidoException("Error: El nombre del alumno no puede estar vacío.");
@@ -114,38 +164,39 @@ public class RegistroAlumnos {
             if (nuevaCarrera == null || nuevaCarrera.trim().isEmpty()) {
                 throw new AtributoInvalidoException("Error: La carrera no puede estar vacía.");
             }
-            
-            Alumno alumno = buscarAlumno(id); 
+
+            Alumno alumno = buscarAlumno(id);
             alumno.setNombre(nuevoNombre);
             alumno.setCarrera(nuevaCarrera);
 
         } catch (EntidadNoEncontradaException | AtributoInvalidoException e) {
-            // Atrapamos la excepción internamente y la relanzamos para que llegue al menú
             throw e;
         }
     }
 
     // ELIMINACIÓN
+    /**
+     * Elimina a un alumno del registro basándose en su identificador.
+     * 
+     * @param id El ID del alumno a remover.
+     * @throws EntidadNoEncontradaException Si el ID no existe en la colección.
+     */
     public void eliminarAlumno(String id) throws EntidadNoEncontradaException {
-        // SIA-12: Envolvemos la lógica de eliminación en el try-catch
         try {
             if (!alumnos.containsKey(id)) {
-                // Si no existe, lanzamos la excepción dentro del try
                 throw new EntidadNoEncontradaException("Error: No se puede eliminar. El ID " + id + " no existe.");
             }
-            // Si pasa la validación, procedemos a eliminar
             alumnos.remove(id);
-            
+
         } catch (EntidadNoEncontradaException e) {
-            // Atrapamos la excepción y la relanzamos hacia la interfaz (SIA-12)
             throw e;
         }
     }
 
-
     // LISTADO
-
-
+    /**
+     * Imprime por consola la información resumida de todos los alumnos registrados.
+     */
     public void mostrarAlumnos() {
         if (alumnos.isEmpty()) {
             System.out.println("No hay alumnos registrados.");
@@ -157,23 +208,16 @@ public class RegistroAlumnos {
         }
     }
 
-
-    // FUNCIONALIDAD DE NEGOCIO
-
-
-    // ==========================================================
-    // FUNCIONALIDAD DE NEGOCIO ESTADÍSTICA (SIA-9)
-    // ==========================================================
+    // FUNCIONALIDADES DE NEGOCIO
     /**
-     * Calcula el KPI de rendimiento promedio de una carrera específica.
-     * Esta funcionalidad procesa un subconjunto filtrado y realiza una 
-     * agregación de datos.
-     * @param carrera
-     * @return 
-     * @throws avanceCurricular.AtributoInvalidoException 
+     * Calcula el KPI de rendimiento promedio de avance curricular para una carrera específica (SIA-9).
+     * Procesa un subconjunto filtrado de los datos globales.
+     * 
+     * @param carrera Nombre de la carrera a analizar.
+     * @return El porcentaje promedio de avance de todos los alumnos de dicha carrera.
+     * @throws AtributoInvalidoException Si el nombre de la carrera proporcionado es inválido.
      */
     public double calcularRendimientoPromedioCarrera(String carrera) throws AtributoInvalidoException {
-        // SIA-12: Envolvemos la validación en try-catch
         try {
             if (carrera == null || carrera.trim().isEmpty()) {
                 throw new AtributoInvalidoException("Error: El nombre de la carrera no puede estar vacío.");
@@ -190,16 +234,22 @@ public class RegistroAlumnos {
             }
 
             if (cantidadAlumnos == 0) {
-                return 0.0; // Aquí sí está bien retornar 0.0, porque la carrera existe pero no hay alumnos
+                return 0.0;
             }
 
             return sumaProgreso / cantidadAlumnos;
-            
+
         } catch (AtributoInvalidoException e) {
             throw e;
         }
     }
-    
+
+    /**
+     * Filtra y retorna una lista de alumnos cuyo progreso es inferior a un umbral determinado.
+     * 
+     * @param porcentajeMinimo El porcentaje de avance límite para considerar "riesgo".
+     * @return Una {@link List} con los alumnos que cumplen el criterio.
+     */
     public List<Alumno> obtenerAlumnosEnRiesgo(double porcentajeMinimo) {
         List<Alumno> enRiesgo = new ArrayList<>();
 
@@ -212,6 +262,11 @@ public class RegistroAlumnos {
         return enRiesgo;
     }
 
+    /**
+     * Genera un reporte por consola de los alumnos identificados en situación de riesgo académico.
+     * 
+     * @param porcentajeMinimo El porcentaje de avance máximo permitido.
+     */
     public void mostrarAlumnosEnRiesgo(double porcentajeMinimo) {
         List<Alumno> lista = obtenerAlumnosEnRiesgo(porcentajeMinimo);
 
@@ -227,11 +282,20 @@ public class RegistroAlumnos {
     }
 
     // UTILIDAD
-
+    /**
+     * Obtiene el número total de alumnos registrados actualmente.
+     * @return Cantidad de alumnos.
+     */
     public int getCantidadAlumnos() {
         return alumnos.size();
     }
 
+    /**
+     * Verifica la existencia de un alumno en el mapa sin lanzar excepciones.
+     * 
+     * @param id El ID a verificar.
+     * @return true si el alumno existe, false en caso contrario o si el ID es nulo.
+     */
     public boolean existeAlumno(String id) {
         if (id == null) {
             return false;
