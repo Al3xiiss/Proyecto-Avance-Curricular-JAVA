@@ -1,5 +1,10 @@
 package avanceCurricular;
 
+/**
+ * Clase abstracta que representa una materia genérica dentro del sistema académico.
+ * Sirve como clase base (plantilla) para definir los atributos y comportamientos 
+ * comunes que compartirán todos los tipos específicos de asignaturas.
+ */
 public abstract class Asignatura {
 
     // ATRIBUTOS 
@@ -11,6 +16,14 @@ public abstract class Asignatura {
 
     // CONSTRUCTOR
 
+    /**
+     * Construye una nueva asignatura con sus datos fundamentales.
+     * Por defecto, toda asignatura recién creada se inicializa en estado no aprobada (false).
+     * 
+     * @param nombre El nombre descriptivo de la asignatura.
+     * @param codigo El código único que identifica a la asignatura (ej. "INF101").
+     * @param creditos La cantidad de créditos o peso académico que aporta la asignatura.
+     */
     public Asignatura(String nombre, String codigo, int creditos) {
         this.nombre = nombre;
         this.codigo = codigo;
@@ -21,35 +34,66 @@ public abstract class Asignatura {
 
     // GETTERS Y SETTERS (SIA-3)
 
-
+    /**
+     * Obtiene el nombre de la asignatura.
+     * @return El nombre de la materia.
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Modifica el nombre de la asignatura.
+     * @param nombre El nuevo nombre a asignar.
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Obtiene el código identificador de la asignatura.
+     * @return El código alfanumérico de la materia.
+     */
     public String getCodigo() {
         return codigo;
     }
 
+    /**
+     * Modifica el código identificador de la asignatura.
+     * @param codigo El nuevo código a asignar.
+     */
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 
+    /**
+     * Obtiene los créditos académicos que vale la asignatura.
+     * @return El número de créditos.
+     */
     public int getCreditos() {
         return creditos;
     }
 
+    /**
+     * Modifica los créditos académicos de la asignatura.
+     * @param creditos El nuevo valor de créditos.
+     */
     public void setCreditos(int creditos) {
         this.creditos = creditos;
     }
 
+    /**
+     * Verifica si la asignatura ha sido aprobada por el alumno.
+     * @return true si la asignatura está aprobada, false si está pendiente o reprobada.
+     */
     public boolean isAprobada() {
         return aprobada;
     }
 
+    /**
+     * Modifica manualmente el estado de aprobación de la asignatura.
+     * @param aprobada El valor booleano (true para aprobada, false para pendiente).
+     */
     public void setAprobada(boolean aprobada) {
         this.aprobada = aprobada;
     }
@@ -57,17 +101,26 @@ public abstract class Asignatura {
 
     // MÉTODOS 
 
-    // Marcar como aprobada
+    /**
+     * Método de conveniencia que cambia el estado de la asignatura directamente a aprobada (true).
+     */
     public void aprobar() {
         this.aprobada = true;
     }
 
-    // Marcar como reprobada
+    /**
+     * Método de conveniencia que cambia el estado de la asignatura directamente a reprobada/pendiente (false).
+     */
     public void reprobar() {
         this.aprobada = false;
     }
-
    
+    /**
+     * Retorna una representación en texto del estado académico actual de la materia.
+     * Útil para mostrar en reportes o en la consola sin imprimir "true" o "false".
+     * 
+     * @return "Aprobada" si el estado es true, "Pendiente" si el estado es false.
+     */
      public String getEstado() {
         if (aprobada == true) {
             return "Aprobada";
@@ -78,5 +131,10 @@ public abstract class Asignatura {
 
     // MÉTODO ABSTRACTO (SIA-6)
 
+    /**
+     * Método abstracto que obliga a todas las clases hijas (subclases) a implementar 
+     * su propia lógica para mostrar la información detallada por consola.
+     * Implementa el concepto de polimorfismo en la aplicación.
+     */
     public abstract void mostrarInfo();
 }
