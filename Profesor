@@ -2,6 +2,11 @@ package avanceCurricular;
 
 import java.util.*;
 
+/**
+ * Representa a un docente dentro del sistema académico.
+ * Almacena la información personal del profesor y gestiona la lista de 
+ * asignaturas que tiene a su cargo (carga académica).
+ */
 public class Profesor {
 
     // ATRIBUTOS
@@ -10,7 +15,15 @@ public class Profesor {
     private String especialidad;
     private final List<Asignatura> asignaturas;
 
-    // CONSTRUCTOR
+    /**
+     * Construye una nueva instancia de un Profesor.
+     * Inicializa la lista de asignaturas como un ArrayList vacío para gestionar 
+     * la carga académica de forma dinámica.
+     * 
+     * @param id Identificador único del profesor.
+     * @param nombre Nombre completo del docente.
+     * @param especialidad Área de conocimiento principal del profesor.
+     */
     public Profesor(String id, String nombre, String especialidad) {
         this.id = id;
         this.nombre = nombre;
@@ -19,35 +32,70 @@ public class Profesor {
     }
 
     // GETTERS Y SETTERS
+
+    /**
+     * Obtiene el identificador del profesor.
+     * @return El ID del docente.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Modifica el identificador del profesor.
+     * @param id El nuevo ID a asignar.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Obtiene el nombre del profesor.
+     * @return El nombre del docente.
+     */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * Modifica el nombre del profesor.
+     * @param nombre El nuevo nombre a asignar.
+     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
+    /**
+     * Obtiene la especialidad del profesor.
+     * @return El área de especialización.
+     */
     public String getEspecialidad() {
         return especialidad;
     }
 
+    /**
+     * Modifica la especialidad del profesor.
+     * @param especialidad La nueva especialidad a asignar.
+     */
     public void setEspecialidad(String especialidad) {
         this.especialidad = especialidad;
     }
 
-
+    /**
+     * Retorna una copia defensiva de las asignaturas a cargo del profesor.
+     * Se utiliza una nueva lista para proteger la integridad de la colección original.
+     * 
+     * @return Una lista con las asignaturas dictadas por el profesor.
+     */
     public List<Asignatura> getAsignaturas() {
         return new ArrayList<>(this.asignaturas);
     }
 
+    /**
+     * Actualiza la lista completa de asignaturas del profesor.
+     * 
+     * @param asignaturas La nueva lista de asignaturas. Si es nula, no se realizan cambios.
+     */
     public void setAsignaturas(List<Asignatura> asignaturas) {
         if (asignaturas != null) {
             this.asignaturas.clear();
@@ -56,6 +104,14 @@ public class Profesor {
     }
 
     // MÉTODOS FUNCIONALES
+
+    /**
+     * Vincula una nueva asignatura a la carga académica del profesor.
+     * Valida que la materia no sea nula y que no haya sido asignada previamente.
+     * 
+     * @param asignatura El objeto Asignatura a vincular.
+     * @throws AtributoInvalidoException Si la asignatura es nula o ya existe en la carga del docente.
+     */
     public void asignarAsignatura(Asignatura asignatura) throws AtributoInvalidoException {
         try {
             if (asignatura == null) {
@@ -69,25 +125,33 @@ public class Profesor {
             asignaturas.add(asignatura);
             
         } catch (AtributoInvalidoException e) {
-            // Relanzamos para que la capa superior maneje el error
             throw e;
         }
     }
 
-    // ELIMINAR ASIGNATURA (SIA-12)
+    /**
+     * Remueve una asignatura de la carga académica del profesor mediante su código.
+     * Utiliza internamente el método de búsqueda para validar la existencia.
+     * 
+     * @param codigo El código de la asignatura a eliminar.
+     * @throws EntidadNoEncontradaException Si el código no corresponde a ninguna materia a cargo.
+     */
     public void eliminarAsignatura(String codigo) throws EntidadNoEncontradaException {
-        // SIA-12: Bloque try-catch explícito en la entidad
         try {
-            // Reutilizamos buscarAsignatura,que LANZA la excepción si no la encuentra
             Asignatura asig = buscarAsignatura(codigo); 
             asignaturas.remove(asig); 
             
         } catch (EntidadNoEncontradaException e) {
-            // Se atrapa la excepción de la búsqueda y se relanza
             throw e;
         }
     }
 
+    /**
+     * Verifica si el profesor ya tiene asignada una materia específica.
+     * 
+     * @param codigo El código de la asignatura a buscar.
+     * @return true si la materia ya está en su lista, false en caso contrario.
+     */
     public boolean tieneAsignatura(String codigo) {
         if (codigo == null) {
             return false;
@@ -101,6 +165,13 @@ public class Profesor {
         return false;
     }
 
+    /**
+     * Busca una asignatura específica dentro de la carga del profesor.
+     * 
+     * @param codigo El código de la asignatura buscada.
+     * @return La instancia de la Asignatura encontrada.
+     * @throws EntidadNoEncontradaException Si el profesor no dicta dicha materia.
+     */
     public Asignatura buscarAsignatura(String codigo) throws EntidadNoEncontradaException {
         try {
             for (Asignatura a : asignaturas) {
@@ -110,11 +181,14 @@ public class Profesor {
             }
             throw new EntidadNoEncontradaException("Error: La asignatura con código " + codigo + " no existe para este profesor.");
         } catch (EntidadNoEncontradaException e) {
-            // SIA-12: Captura y relanza internamente
             throw e;
         }
     }
 
+    /**
+     * Muestra por consola la información detallada del profesor y el 
+     * listado de materias que dicta actualmente.
+     */
     public void mostrarInfo() {
         System.out.println("ID: " + id);
         System.out.println("Nombre: " + nombre);
