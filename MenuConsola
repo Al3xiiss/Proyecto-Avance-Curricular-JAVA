@@ -14,6 +14,8 @@ public class MenuConsola {
         int opcion;
 
         do {
+            limpiarPantalla(); // Limpia todo el texto anterior
+
             System.out.println("\n========== MENU PRINCIPAL ==========");
             System.out.println("1. Gestionar alumnos");
             System.out.println("2. Gestionar profesores");
@@ -35,6 +37,9 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
+            if (opcion != 3) {
+                pausar();
+            }
 
         } while (opcion != 3);
     }
@@ -43,6 +48,8 @@ public class MenuConsola {
         int opcion;
 
         do {
+            limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+
             System.out.println("\n========== MENU ALUMNOS ==========");
             System.out.println("1. Agregar alumno");
             System.out.println("2. Mostrar alumnos");
@@ -92,6 +99,10 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
+            // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+            if (opcion != 10) {
+                pausar();
+            }
 
         } while (opcion != 10);
     }
@@ -100,6 +111,8 @@ public class MenuConsola {
         int opcion;
 
         do {
+            limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+
             System.out.println("\n========== MENU PROFESORES ==========");
             System.out.println("1. Agregar profesor");
             System.out.println("2. Mostrar profesores");
@@ -145,6 +158,10 @@ public class MenuConsola {
                 default:
                     System.out.println("Opcion invalida.");
             }
+            // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+            if (opcion != 9) {
+                pausar();
+            }
 
         } while (opcion != 9);
     }
@@ -159,6 +176,8 @@ public class MenuConsola {
             int opcion;
 
             do {
+                limpiarPantalla(); // LIMPIA LA CONSOLA AL INICIO DEL BUCLE
+
                 System.out.println("\n--- ASIGNATURAS DICTADAS POR: " + profesor.getNombre().toUpperCase() + " ---");
                 System.out.println("1. Agregar nueva Asignatura");
                 System.out.println("2. Ver listado de asignaturas");
@@ -192,11 +211,16 @@ public class MenuConsola {
                     default:
                         System.out.println("Opción inválida.");
                 }
+                // PAUSA ANTES DE VOLVER A LIMPIAR (Si no eligió salir)
+                if (opcion != 6) {
+                    pausar();
+                }
             } while (opcion != 6);
 
         } catch (EntidadNoEncontradaException e) {
             // Atrapa el error si el ID del profesor no existe
             System.out.println(e.getMessage());
+            pausar(); // Para que el usuario alcance a leer el error
         }
     }
 
@@ -221,7 +245,7 @@ public class MenuConsola {
                 profesor.asignarAsignatura(new AsignaturaElectiva(nom, cod, cre, area));
             }
             System.out.println("Asignatura vinculada al profesor correctamente.");
-            
+
         } catch (AtributoInvalidoException e) {
             System.out.println(e.getMessage());
         }
@@ -284,6 +308,8 @@ public class MenuConsola {
             int opcion;
 
             do {
+                limpiarPantalla(); // LIMPIA
+
                 System.out.println("\n--- GESTION DE ASIGNATURAS: " + alumno.getNombre().toUpperCase() + " ---");
                 System.out.println("1. Agregar Asignatura");
                 System.out.println("2. Mostrar Malla Curricular");
@@ -317,10 +343,14 @@ public class MenuConsola {
                     default:
                         System.out.println("Opcion no valida.");
                 }
+                if (opcion != 6) {
+                    pausar(); // PAUSA
+                }
             } while (opcion != 6);
 
         } catch (EntidadNoEncontradaException e) {
             System.out.println(e.getMessage());
+            pausar(); // Por buena práctica pausar aquí también por si el ID no existía
         }
     }
 
@@ -356,7 +386,7 @@ public class MenuConsola {
             }
             // Si el bloque try finaliza sin errores, se imprime el éxito
             System.out.println("Asignatura agregada con éxito a la malla.");
-            
+
         } catch (AtributoInvalidoException e) {
             // El mensaje de "Ya existe" o "Datos nulos" viene directamente de la lógica
             System.out.println(e.getMessage());
@@ -423,7 +453,7 @@ public class MenuConsola {
             // Se llama al método que ahora lanza AtributoInvalidoException
             registroAlumnos.agregarAlumno(id, nombre, carrera);
             System.out.println("Alumno agregado correctamente.");
-            
+
         } catch (AtributoInvalidoException e) {
             // SIA-12: El manejo de la excepción permite informar exactamente qué falló
             System.out.println(e.getMessage());
@@ -472,7 +502,7 @@ public class MenuConsola {
         String nombre = leerTexto();
         System.out.print("Ingrese carrera: ");
         String carrera = leerTexto();
-        
+
         try {
             Alumno alumno = registroAlumnos.buscarAlumno(nombre, carrera);
             alumno.mostrarInfo();
@@ -500,7 +530,7 @@ public class MenuConsola {
             // Se llama al método que ahora lanza AtributoInvalidoException
             registroProfesores.agregarProfesor(id, nombre, especialidad);
             System.out.println("Profesor agregado correctamente.");
-            
+
         } catch (AtributoInvalidoException e) {
             // SIA-12: Captura el error (ID duplicado o campos vacíos) y muestra el mensaje descriptivo
             System.out.println(e.getMessage());
@@ -565,9 +595,9 @@ public class MenuConsola {
     private void mostrarProfesoresPorEspecialidad(RegistroProfesores registroProfesores) {
         System.out.print("Ingrese especialidad a buscar: ");
         String especialidad = leerTexto();
-        
+
         List<Profesor> lista = registroProfesores.obtenerProfesoresPorEspecialidad(especialidad);
-        
+
         if (lista.isEmpty()) {
             System.out.println("No se encontraron profesores con la especialidad: " + especialidad);
         } else {
@@ -577,11 +607,11 @@ public class MenuConsola {
             }
         }
     }
-    
+
     private void analizarRendimientoCarrera(RegistroAlumnos registroAlumnos) {
         System.out.print("Ingrese el nombre de la carrera a analizar (ej. Ingenieria en Sistemas): ");
         String carrera = leerTexto();
-        
+
         try {
             double promedioGlobal = registroAlumnos.calcularRendimientoPromedioCarrera(carrera);
 
@@ -636,5 +666,21 @@ public class MenuConsola {
                 System.out.print("Error: Ingrese un valor numerico valido: ");
             }
         }
+    }
+
+    // ==========================================================
+    // UTILIDADES DE CONSOLA (Optimizadas para NetBeans)
+    // ==========================================================
+    private void limpiarPantalla() {
+        // La técnica estándar es imprimir suficientes saltos de línea para "limpiar" la vista.
+        for (int i = 0; i < 50; i++) {
+            System.out.println();
+        }
+    }
+
+    private void pausar() {
+        System.out.println("\n------------------------------------------------");
+        System.out.println("Presione ENTER para continuar...");
+        scanner.nextLine(); // Pausa la ejecución hasta que se detecte el Enter
     }
 }
