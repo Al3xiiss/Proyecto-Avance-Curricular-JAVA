@@ -1,8 +1,8 @@
-# Sistema Académico de Avance Curricular 🎓
+# Sistema Académico de Avance Curricular
 
 Proyecto desarrollado para el curso de **Programación Avanzada**. Consiste en un sistema de gestión académica robusto que permite administrar alumnos, docentes y sus respectivas cargas académicas, cumpliendo con estándares de arquitectura orientada a objetos en Java.
 
-## 🚀 Instalación y Ejecución
+##  Instalación y Ejecución
 
 ### 1. Requisitos Previos
 Para ejecutar este sistema, asegúrese de tener instalado:
@@ -19,7 +19,7 @@ El proyecto utiliza persistencia en modo **batch** (carga al inicio y guardado a
 
 ---
 
-## 📚 Documentación Técnica (Javadoc)
+## Documentación Técnica (Javadoc)
 Este proyecto cumple con el requerimiento **SIA-O3**, contando con documentación técnica detallada de cada clase y método. 
 
 Para visualizarla:
@@ -28,7 +28,7 @@ Para visualizarla:
 
 ---
 
-## 🛠️ Instrucciones de Uso
+## Instrucciones de Uso
 
 Al iniciar, el sistema permite elegir entre dos interfaces de usuario:
 1. **Modo Consola:** Interfaz de texto optimizada para visualización rápida de datos.
@@ -42,7 +42,7 @@ Al iniciar, el sistema permite elegir entre dos interfaces de usuario:
 
 ---
 
-## 🔗 Enlaces y Repositorio
+## Enlaces y Repositorio
 * **GitHub:** [https://github.com/Al3xiiss/Proyecto-Avance-Curricular-JAVA](https://github.com/Al3xiiss/Proyecto-Avance-Curricular-JAVA)
 
 ---
