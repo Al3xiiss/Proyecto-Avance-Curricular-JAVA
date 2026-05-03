@@ -9,7 +9,7 @@ Para ejecutar este sistema, asegúrese de tener instalado:
 * **Java JDK:** Versión 17 o superior.
 * **IDE Recomendado:** NetBeans (facilita la gestión de proyectos Ant y la generación de Javadoc).
 * **Sistema Operativo:** Windows, macOS o Linux.
-
+---
 ### 2. Estructura de Datos
 El proyecto utiliza persistencia en modo **batch** (carga al inicio y guardado al cierre). Requiere que los siguientes archivos `.txt` estén en la raíz del proyecto para funcionar correctamente:
 * `alumnos.txt`: Registro base de estudiantes.
@@ -33,7 +33,7 @@ Para visualizarla:
 Al iniciar, el sistema permite elegir entre dos interfaces de usuario:
 1. **Modo Consola:** Interfaz de texto optimizada para visualización rápida de datos.
 2. **Modo Ventana:** Interfaz gráfica basada en `JOptionPane` para una gestión intuitiva (SIA-12).
-
+---
 ### Funcionalidades destacadas:
 * **Gestión de Alumnos:** Inserción, edición, eliminación y búsqueda avanzada.
 * **Análisis de Rendimiento (KPI):** Cálculo de progreso curricular y rendimiento promedio por carrera (SIA-9).
