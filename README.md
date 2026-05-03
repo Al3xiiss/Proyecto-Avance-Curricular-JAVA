@@ -322,7 +322,7 @@ classDiagram
     RegistroAlumnos ..> AtributoInvalidoException : throws
     RegistroProfesores ..> EntidadNoEncontradaException : throws
     RegistroProfesores ..> AtributoInvalidoException : throws
-
+```
 
 
 ---
